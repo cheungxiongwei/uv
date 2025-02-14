@@ -1,66 +1,60 @@
-# Getting help
+# 获取帮助
 
-## Help menus
+## 帮助菜单
 
-The `--help` flag can be used to view the help menu for a command, e.g., for `uv`:
+可以使用 `--help` 标志查看命令的帮助菜单，例如，对于 `uv`：
 
 ```console
 $ uv --help
 ```
 
-To view the help menu for a specific command, e.g., for `uv init`:
+要查看特定命令的帮助菜单，例如，对于 `uv init`：
 
 ```console
 $ uv init --help
 ```
 
-When using the `--help` flag, uv displays a condensed help menu. To view a longer help menu for a
-command, use `uv help`:
+使用 `--help` 标志时，uv 会显示简短的帮助菜单。要查看命令的详细帮助菜单，请使用 `uv help`：
 
 ```console
 $ uv help
 ```
 
-To view the long help menu for a specific command, e.g., for `uv init`:
+要查看特定命令的详细帮助菜单，例如，对于 `uv init`：
 
 ```console
 $ uv help init
 ```
 
-When using the long help menu, uv will attempt to use `less` or `more` to "page" the output so it is
-not all displayed at once. To exit the pager, press `q`.
+使用详细帮助菜单时，uv 会尝试使用 `less` 或 `more` 来“分页”显示输出，以免一次性显示所有内容。要退出分页器，请按 `q`。
 
-## Viewing the version
+## 查看版本
 
-When seeking help, it's important to determine the version of uv that you're using — sometimes the
-problem is already solved in a newer version.
+在寻求帮助时，确定您使用的 uv 版本非常重要——有时问题在较新的版本中已经解决。
 
-To check the installed version:
+要检查安装的版本：
 
 ```console
 $ uv version
 ```
 
-The following are also valid:
+以下命令同样有效：
 
 ```console
-$ uv --version      # Same output as `uv version`
-$ uv -V             # Will not include the build commit and date
-$ uv pip --version  # Can be used with a subcommand
+$ uv --version      # 与 `uv version` 输出相同
+$ uv -V             # 不包含构建提交和日期
+$ uv pip --version  # 可以与子命令一起使用
 ```
 
-## Troubleshooting issues
+## 问题排查
 
-The reference documentation contains a
-[troubleshooting guide](../reference/troubleshooting/index.md) for common issues.
+参考文档中包含针对常见问题的[问题排查指南](../reference/troubleshooting/index.md)。
 
-## Open an issue on GitHub
+## 在 GitHub 上提交问题
 
-The [issue tracker](https://github.com/astral-sh/uv/issues) on GitHub is a good place to report bugs
-and request features. Make sure to search for similar issues first, as it is common for someone else
-to encounter the same problem.
+GitHub 上的[问题跟踪器](https://github.com/astral-sh/uv/issues)是报告错误和请求功能的好地方。请确保先搜索类似问题，因为其他人可能也遇到了相同的问题。
 
-## Chat on Discord
+## 在 Discord 上交流
 
-Astral has a [Discord server](https://discord.com/invite/astral-sh), which is a great place to ask
-questions, learn more about uv, and engage with other community members.
+Astral 有一个 [Discord 服务器](https://discord.com/invite/astral-sh)，这是提问、了解更多关于 uv 的信息以及与其他社区成员互动的好地方。
+

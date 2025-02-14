@@ -1,8 +1,8 @@
-# CLI Reference
+# CLI 参考
 
 ## uv
 
-An extremely fast Python package manager.
+一个极速的 Python 包管理器。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -52,17 +52,17 @@ uv [OPTIONS] <COMMAND>
 
 ## uv run
 
-Run a command or script.
+运行命令或脚本。
 
-Ensures that the command runs in a Python environment.
+确保命令在 Python 环境中运行。
 
-When used with a file ending in `.py` or an HTTP(S) URL, the file will be treated as a script and run with a Python interpreter, i.e., `uv run file.py` is equivalent to `uv run python file.py`. For URLs, the script is temporarily downloaded before execution. If the script contains inline dependency metadata, it will be installed into an isolated, ephemeral environment. When used with `-`, the input will be read from stdin, and treated as a Python script.
+当使用以 `.py` 结尾的文件或 HTTP(S) URL 时，文件将被视为脚本并使用 Python 解释器运行，即 `uv run file.py` 等同于 `uv run python file.py`。对于 URL，脚本会临时下载后执行。如果脚本包含内联依赖元数据，它们将被安装到一个隔离的临时环境中。当使用 `-` 时，输入将从 stdin 读取，并被视为 Python 脚本。
 
-When used in a project, the project environment will be created and updated before invoking the command.
+在项目中使用时，项目环境将在调用命令之前创建并更新。
 
-When used outside a project, if a virtual environment can be found in the current directory or a parent directory, the command will be run in that environment. Otherwise, the command will be run in the environment of the discovered interpreter.
+在项目外使用时，如果在当前目录或父目录中找到虚拟环境，命令将在该环境中运行。否则，命令将在发现的解释器环境中运行。
 
-Arguments following the command (or script) are not interpreted as arguments to uv. All options to uv must be provided before the command, e.g., `uv run --verbose foo`. A `--` can be used to separate the command from uv options for clarity, e.g., `uv run --python 3.12 -- python`.
+命令（或脚本）之后的参数不会被解释为 uv 的参数。所有 uv 的选项必须在命令之前提供，例如 `uv run --verbose foo`。可以使用 `--` 将命令与 uv 选项分开以增加清晰度，例如 `uv run --python 3.12 -- python`。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -501,15 +501,15 @@ uv run [OPTIONS] [COMMAND]
 
 ## uv init
 
-Create a new project.
+创建一个新项目。
 
-Follows the `pyproject.toml` specification.
+遵循 `pyproject.toml` 规范。
 
-If a `pyproject.toml` already exists at the target, uv will exit with an error.
+如果目标路径下已存在 `pyproject.toml`，uv 将报错退出。
 
-If a `pyproject.toml` is found in any of the parent directories of the target path, the project will be added as a workspace member of the parent.
+如果在目标路径的任意父目录中找到 `pyproject.toml`，该项目将被添加为父项目的 workspace 成员。
 
-Some project state is not created until needed, e.g., the project virtual environment (`.venv`) and lockfile (`uv.lock`) are lazily created during the first sync.
+部分项目状态会在需要时创建，例如项目虚拟环境 (`.venv`) 和锁文件 (`uv.lock`) 会在首次同步时延迟创建。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -740,19 +740,19 @@ uv init [OPTIONS] [PATH]
 
 ## uv add
 
-Add dependencies to the project.
+将依赖项添加到项目中。
 
-Dependencies are added to the project's `pyproject.toml` file.
+依赖项将被添加到项目的 `pyproject.toml` 文件中。
 
-If a given dependency exists already, it will be updated to the new version specifier unless it includes markers that differ from the existing specifier in which case another entry for the dependency will be added.
+如果给定的依赖项已存在，它将被更新为新的版本限定符，除非其包含的标记与现有限定符不同，在这种情况下，将为该依赖项添加另一个条目。
 
-If no constraint or URL is provided for a dependency, a lower bound is added equal to the latest compatible version of the package, e.g., `>=1.2.3`, unless `--frozen` is provided, in which case no resolution is performed.
+如果没有为依赖项提供约束或 URL，则会添加一个下限，等于该包的最新兼容版本，例如 `>=1.2.3`，除非提供了 `--frozen`，在这种情况下，不会执行解析。
 
-The lockfile and project environment will be updated to reflect the added dependencies. To skip updating the lockfile, use `--frozen`. To skip updating the environment, use `--no-sync`.
+lockfile 和项目环境将更新以反映添加的依赖项。要跳过更新 lockfile，请使用 `--frozen`。要跳过更新环境，请使用 `--no-sync`。
 
-If any of the requested dependencies cannot be found, uv will exit with an error, unless the `--frozen` flag is provided, in which case uv will add the dependencies verbatim without checking that they exist or are compatible with the project.
+如果无法找到任何请求的依赖项，uv 将退出并报错，除非提供了 `--frozen` 标志，在这种情况下，uv 将直接添加依赖项，而不检查它们是否存在或与项目兼容。
 
-uv will search for a project in the current directory or any parent directory. If a project cannot be found, uv will exit with an error.
+uv 将在当前目录或任何父目录中搜索项目。如果找不到项目，uv 将退出并报错。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -1115,19 +1115,19 @@ uv add [OPTIONS] <PACKAGES|--requirements <REQUIREMENTS>>
 
 ## uv remove
 
-Remove dependencies from the project.
+从项目中移除依赖项。
 
-Dependencies are removed from the project's `pyproject.toml` file.
+依赖项将从项目的 `pyproject.toml` 文件中移除。
 
-If multiple entries exist for a given dependency, i.e., each with different markers, all of the entries will be removed.
+如果某个依赖项存在多个条目（例如，每个条目具有不同的标记），则所有条目都将被移除。
 
-The lockfile and project environment will be updated to reflect the removed dependencies. To skip updating the lockfile, use `--frozen`. To skip updating the environment, use `--no-sync`.
+锁文件和项目环境将更新以反映移除的依赖项。要跳过更新锁文件，请使用 `--frozen`。要跳过更新环境，请使用 `--no-sync`。
 
-If any of the requested dependencies are not present in the project, uv will exit with an error.
+如果请求的依赖项中有任何一项未在项目中存在，uv 将以错误退出。
 
-If a package has been manually installed in the environment, i.e., with `uv pip install`, it will not be removed by `uv remove`.
+如果某个包已手动安装在环境中（例如，使用 `uv pip install`），则不会被 `uv remove` 移除。
 
-uv will search for a project in the current directory or any parent directory. If a project cannot be found, uv will exit with an error.
+uv 将在当前目录或任何父目录中搜索项目。如果找不到项目，uv 将以错误退出。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -1464,19 +1464,19 @@ uv remove [OPTIONS] <PACKAGES>...
 
 ## uv sync
 
-Update the project's environment.
+更新项目的环境。
 
-Syncing ensures that all project dependencies are installed and up-to-date with the lockfile.
+同步操作确保所有项目依赖都已安装并与 lockfile 保持最新。
 
-By default, an exact sync is performed: uv removes packages that are not declared as dependencies of the project. Use the `--inexact` flag to keep extraneous packages. Note that if an extraneous package conflicts with a project dependency, it will still be removed. Additionally, if `--no-build-isolation` is used, uv will not remove extraneous packages to avoid removing possible build dependencies.
+默认情况下，会执行精确同步：uv 会移除未声明为项目依赖的包。使用 `--inexact` 标志可以保留多余的包。请注意，如果多余的包与项目依赖冲突，它仍将被移除。此外，如果使用了 `--no-build-isolation`，uv 将不会移除多余的包，以避免移除可能的构建依赖。
 
-If the project virtual environment (`.venv`) does not exist, it will be created.
+如果项目虚拟环境 (`.venv`) 不存在，它将被创建。
 
-The project is re-locked before syncing unless the `--locked` or `--frozen` flag is provided.
+除非提供了 `--locked` 或 `--frozen` 标志，否则在同步之前会重新锁定项目。
 
-uv will search for a project in the current directory or any parent directory. If a project cannot be found, uv will exit with an error.
+uv 会在当前目录或任何父目录中搜索项目。如果找不到项目，uv 将退出并报错。
 
-Note that, when installing from a lockfile, uv will not provide warnings for yanked package versions.
+请注意，当从 lockfile 安装时，uv 不会为已下架的包版本提供警告。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -1882,11 +1882,11 @@ uv sync [OPTIONS]
 
 ## uv lock
 
-Update the project's lockfile.
+更新项目的 lockfile。
 
-If the project lockfile (`uv.lock`) does not exist, it will be created. If a lockfile is present, its contents will be used as preferences for the resolution.
+如果项目的 lockfile (`uv.lock`) 不存在，将会被创建。如果 lockfile 已存在，其内容将用作解析的偏好设置。
 
-If there are no changes to the project's dependencies, locking will have no effect unless the `--upgrade` flag is provided.
+如果项目的依赖项没有变化，除非提供了 `--upgrade` 标志，否则锁定将不会产生任何效果。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -2201,15 +2201,15 @@ uv lock [OPTIONS]
 
 ## uv export
 
-Export the project's lockfile to an alternate format.
+将项目的 lockfile 导出为其他格式。
 
-At present, only `requirements-txt` is supported.
+目前仅支持 `requirements-txt` 格式。
 
-The project is re-locked before exporting unless the `--locked` or `--frozen` flag is provided.
+除非提供了 `--locked` 或 `--frozen` 标志，否则在导出前会重新锁定项目。
 
-uv will search for a project in the current directory or any parent directory. If a project cannot be found, uv will exit with an error.
+uv 会在当前目录或任何父目录中搜索项目。如果找不到项目，uv 将退出并报错。
 
-If operating in a workspace, the root will be exported by default; however, a specific member can be selected using the `--package` option.
+如果在 workspace 中操作，默认会导出根项目；但可以使用 `--package` 选项选择特定的成员。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -2606,7 +2606,7 @@ uv export [OPTIONS]
 
 ## uv tree
 
-Display the project's dependency tree
+显示项目的依赖树
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -3049,9 +3049,9 @@ uv tree [OPTIONS]
 
 </dd></dl>
 
-## uv tool
+## uv 工具
 
-Run and install commands provided by Python packages
+运行和安装 Python 包提供的命令
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -3079,21 +3079,21 @@ uv tool [OPTIONS] <COMMAND>
 
 ### uv tool run
 
-Run a command provided by a Python package.
+运行由 Python 包提供的命令。
 
-By default, the package to install is assumed to match the command name.
+默认情况下，要安装的包假定与命令名称匹配。
 
-The name of the command can include an exact version in the format `<package>@<version>`, e.g., `uv tool run ruff@0.3.0`. If more complex version specification is desired or if the command is provided by a different package, use `--from`.
+命令名称可以包含精确版本号，格式为 `<package>@<version>`，例如 `uv tool run ruff@0.3.0`。如果需要更复杂的版本规范，或者命令由不同的包提供，请使用 `--from`。
 
-`uvx` can be used to invoke Python, e.g., with `uvx python` or `uvx python@<version>`. A Python interpreter will be started in an isolated virtual environment.
+`uvx` 可用于调用 Python，例如 `uvx python` 或 `uvx python@<version>`。Python 解释器将在隔离的虚拟环境中启动。
 
-If the tool was previously installed, i.e., via `uv tool install`, the installed version will be used unless a version is requested or the `--isolated` flag is used.
+如果工具之前已安装，即通过 `uv tool install` 安装，除非指定了版本或使用了 `--isolated` 标志，否则将使用已安装的版本。
 
-`uvx` is provided as a convenient alias for `uv tool run`, their behavior is identical.
+`uvx` 是 `uv tool run` 的便捷别名，它们的行为完全相同。
 
-If no command is provided, the installed tools are displayed.
+如果未提供命令，则显示已安装的工具。
 
-Packages are installed into an ephemeral virtual environment in the uv cache directory.
+包将安装到 uv 缓存目录中的临时虚拟环境中。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -3407,11 +3407,11 @@ uv tool run [OPTIONS] [COMMAND]
 
 ### uv tool install
 
-Install commands provided by a Python package.
+安装由 Python 包提供的命令。
 
-Packages are installed into an isolated virtual environment in the uv tools directory. The executables are linked the tool executable directory, which is determined according to the XDG standard and can be retrieved with `uv tool dir --bin`.
+包将被安装到 uv tools 目录中的隔离虚拟环境中。可执行文件将链接到工具可执行文件目录，该目录根据 XDG 标准确定，并可通过 `uv tool dir --bin` 获取。
 
-If the tool was previously installed, the existing tool will generally be replaced.
+如果该工具之前已安装，通常将替换现有工具。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -3743,11 +3743,11 @@ uv tool install [OPTIONS] <PACKAGE>
 
 ### uv tool upgrade
 
-Upgrade installed tools.
+升级已安装的工具。
 
-If a tool was installed with version constraints, they will be respected on upgrade — to upgrade a tool beyond the originally provided constraints, use `uv tool install` again.
+如果工具在安装时指定了版本约束，升级时将遵循这些约束 — 若要升级到超出原始约束的版本，请再次使用 `uv tool install`。
 
-If a tool was installed with specific settings, they will be respected on upgraded. For example, if `--prereleases allow` was provided during installation, it will continue to be respected in upgrades.
+如果工具在安装时指定了特定设置，升级时将遵循这些设置。例如，如果在安装时提供了 `--prereleases allow`，在升级时仍将遵循此设置。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -4047,7 +4047,7 @@ uv tool upgrade [OPTIONS] <NAME>...
 
 ### uv tool list
 
-List installed tools
+列出已安装的工具
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -4150,7 +4150,7 @@ uv tool list [OPTIONS]
 
 ### uv tool uninstall
 
-Uninstall a tool
+卸载工具
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -4275,13 +4275,13 @@ uv tool uninstall [OPTIONS] <NAME>...
 
 ### uv tool update-shell
 
-Ensure that the tool executable directory is on the `PATH`.
+确保工具可执行目录在 `PATH` 中。
 
-If the tool executable directory is not present on the `PATH`, uv will attempt to add it to the relevant shell configuration files.
+如果工具可执行目录不在 `PATH` 中，uv 将尝试将其添加到相关的 shell 配置文件中。
 
-If the shell configuration files already include a blurb to add the executable directory to the path, but the directory is not present on the `PATH`, uv will exit with an error.
+如果 shell 配置文件中已经包含将可执行目录添加到路径的片段，但该目录仍不在 `PATH` 中，uv 将退出并报错。
 
-The tool executable directory is determined according to the XDG standard and can be retrieved with `uv tool dir --bin`.
+工具可执行目录根据 XDG 标准确定，可以通过 `uv tool dir --bin` 获取。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -4398,15 +4398,15 @@ uv tool update-shell [OPTIONS]
 
 ### uv tool dir
 
-Show the path to the uv tools directory.
+显示 uv 工具目录的路径。
 
-The tools directory is used to store environments and metadata for installed tools.
+工具目录用于存储已安装工具的环境和元数据。
 
-By default, tools are stored in the uv data directory at `$XDG_DATA_HOME/uv/tools` or `$HOME/.local/share/uv/tools` on Unix and `%APPDATA%\uv\data\tools` on Windows.
+默认情况下，工具存储在 uv 数据目录中，路径为 `$XDG_DATA_HOME/uv/tools` 或 `$HOME/.local/share/uv/tools`（在 Unix 系统上），以及 `%APPDATA%\uv\data\tools`（在 Windows 系统上）。
 
-The tool installation directory may be overridden with `$UV_TOOL_DIR`.
+可以通过 `$UV_TOOL_DIR` 覆盖工具安装目录。
 
-To instead view the directory uv installs executables into, use the `--bin` flag.
+要查看 uv 安装可执行文件的目录，请使用 `--bin` 标志。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -4539,45 +4539,35 @@ uv tool dir [OPTIONS]
 
 ## uv python
 
-Manage Python versions and installations
+管理 Python 版本和安装
 
-Generally, uv first searches for Python in a virtual environment, either active or in a
-`.venv` directory in the current working directory or any parent directory. If a virtual
-environment is not required, uv will then search for a Python interpreter. Python
-interpreters are found by searching for Python executables in the `PATH` environment
-variable.
+通常，uv 首先会在虚拟环境中搜索 Python，无论是在当前工作目录或其任何父目录中的 `.venv` 目录中。如果不需要虚拟环境，uv 则会搜索 Python 解释器。Python 解释器通过在 `PATH` 环境变量中搜索 Python 可执行文件来找到。
 
-On Windows, the registry is also searched for Python executables.
+在 Windows 上，还会在注册表中搜索 Python 可执行文件。
 
-By default, uv will download Python if a version cannot be found. This behavior can be
-disabled with the `--no-python-downloads` flag or the `python-downloads` setting.
+默认情况下，如果找不到指定版本，uv 会下载 Python。可以通过 `--no-python-downloads` 标志或 `python-downloads` 设置禁用此行为。
 
-The `--python` option allows requesting a different interpreter.
+`--python` 选项允许请求不同的解释器。
 
-The following Python version request formats are supported:
+支持以下 Python 版本请求格式：
 
-- `<version>` e.g. `3`, `3.12`, `3.12.3`
-- `<version-specifier>` e.g. `>=3.12,<3.13`
-- `<implementation>` e.g. `cpython` or `cp`
-- `<implementation>@<version>` e.g. `cpython@3.12`
-- `<implementation><version>` e.g. `cpython3.12` or `cp312`
-- `<implementation><version-specifier>` e.g. `cpython>=3.12,<3.13`
-- `<implementation>-<version>-<os>-<arch>-<libc>` e.g. `cpython-3.12.3-macos-aarch64-none`
+- `<version>` 例如 `3`, `3.12`, `3.12.3`
+- `<version-specifier>` 例如 `>=3.12,<3.13`
+- `<implementation>` 例如 `cpython` 或 `cp`
+- `<implementation>@<version>` 例如 `cpython@3.12`
+- `<implementation><version>` 例如 `cpython3.12` 或 `cp312`
+- `<implementation><version-specifier>` 例如 `cpython>=3.12,<3.13`
+- `<implementation>-<version>-<os>-<arch>-<libc>` 例如 `cpython-3.12.3-macos-aarch64-none`
 
-Additionally, a specific system Python interpreter can often be requested with:
+此外，通常可以通过以下方式请求特定的系统 Python 解释器：
 
-- `<executable-path>` e.g. `/opt/homebrew/bin/python3`
-- `<executable-name>` e.g. `mypython3`
-- `<install-dir>` e.g. `/some/environment/`
+- `<executable-path>` 例如 `/opt/homebrew/bin/python3`
+- `<executable-name>` 例如 `mypython3`
+- `<install-dir>` 例如 `/some/environment/`
 
-When the `--python` option is used, normal discovery rules apply but discovered interpreters
-are checked for compatibility with the request, e.g., if `pypy` is requested, uv will first
-check if the virtual environment contains a PyPy interpreter then check if each executable
-in the path is a PyPy interpreter.
+当使用 `--python` 选项时，正常的发现规则适用，但发现的解释器会检查是否与请求兼容，例如，如果请求了 `pypy`，uv 会首先检查虚拟环境中是否包含 PyPy 解释器，然后检查路径中的每个可执行文件是否为 PyPy 解释器。
 
-uv supports discovering CPython, PyPy, and GraalPy interpreters. Unsupported interpreters
-will be skipped during discovery. If an unsupported interpreter implementation is requested,
-uv will exit with an error.
+uv 支持发现 CPython、PyPy 和 GraalPy 解释器。不支持的解释器将在发现过程中被跳过。如果请求了不支持的解释器实现，uv 将退出并报错。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -4603,15 +4593,15 @@ uv python [OPTIONS] <COMMAND>
 
 ### uv python list
 
-List the available Python installations.
+列出可用的 Python 安装。
 
-By default, installed Python versions and the downloads for latest available patch version of each supported Python major version are shown.
+默认情况下，会显示已安装的 Python 版本以及每个受支持的 Python 主版本的最新可用补丁版本的下载。
 
-The displayed versions are filtered by the `--python-preference` option, i.e., if using `only-system`, no managed Python versions will be shown.
+显示的版本会根据 `--python-preference` 选项进行过滤，例如，如果使用 `only-system`，则不会显示托管 Python 版本。
 
-Use `--all-versions` to view all available patch versions.
+使用 `--all-versions` 查看所有可用的补丁版本。
 
-Use `--only-installed` to omit available downloads.
+使用 `--only-installed` 忽略可用的下载。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -4762,17 +4752,17 @@ uv python list [OPTIONS]
 
 ### uv python install
 
-Download and install Python versions.
+下载并安装 Python 版本。
 
-Supports CPython and PyPy. CPython distributions are downloaded from the Astral `python-build-standalone` project. PyPy distributions are downloaded from `python.org`. The available Python versions are bundled with each uv release. To install new Python versions, you may need upgrade uv.
+支持 CPython 和 PyPy。CPython 发行版从 Astral `python-build-standalone` 项目下载。PyPy 发行版从 `python.org` 下载。可用的 Python 版本随每个 uv 版本一起打包。要安装新的 Python 版本，可能需要升级 uv。
 
-Python versions are installed into the uv Python directory, which can be retrieved with `uv python dir`.
+Python 版本会安装到 uv 的 Python 目录中，该目录可以通过 `uv python dir` 获取。
 
-A `python` executable is not made globally available, managed Python versions are only used in uv commands or in active virtual environments. There is experimental support for adding Python executables to the `PATH` — use the `--preview` flag to enable this behavior.
+不会全局提供 `python` 可执行文件，管理的 Python 版本仅在 uv 命令或激活的虚拟环境中使用。实验性支持将 Python 可执行文件添加到 `PATH` 中——使用 `--preview` 标志启用此行为。
 
-Multiple Python versions may be requested.
+可以请求安装多个 Python 版本。
 
-See `uv help python` to view supported request formats.
+查看 `uv help python` 以了解支持的请求格式。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -4938,11 +4928,11 @@ uv python install [OPTIONS] [TARGETS]...
 
 ### uv python find
 
-Search for a Python installation.
+搜索 Python 安装。
 
-Displays the path to the Python executable.
+显示 Python 可执行文件的路径。
 
-See `uv help python` to view supported request formats and details on discovery behavior.
+查看 `uv help python` 以了解支持的请求格式和发现行为的详细信息。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -5078,13 +5068,13 @@ uv python find [OPTIONS] [REQUEST]
 
 ### uv python pin
 
-Pin to a specific Python version.
+锁定特定的 Python 版本。
 
-Writes the pinned Python version to a `.python-version` file, which is used by other uv commands to determine the required Python version.
+将锁定的 Python 版本写入 `.python-version` 文件，该文件用于其他 uv 命令确定所需的 Python 版本。
 
-If no version is provided, uv will look for an existing `.python-version` file and display the currently pinned version. If no `.python-version` file is found, uv will exit with an error.
+如果未提供版本，uv 将查找现有的 `.python-version` 文件并显示当前锁定的版本。如果未找到 `.python-version` 文件，uv 将退出并报错。
 
-See `uv help python` to view supported request formats.
+参见 `uv help python` 查看支持的请求格式。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -5223,13 +5213,13 @@ uv python pin [OPTIONS] [REQUEST]
 
 ### uv python dir
 
-Show the uv Python installation directory.
+显示 uv 的 Python 安装目录。
 
-By default, Python installations are stored in the uv data directory at `$XDG_DATA_HOME/uv/python` or `$HOME/.local/share/uv/python` on Unix and `%APPDATA%\uv\data\python` on Windows.
+默认情况下，Python 安装目录存储在 uv 的数据目录中，Unix 系统下为 `$XDG_DATA_HOME/uv/python` 或 `$HOME/.local/share/uv/python`，Windows 系统下为 `%APPDATA%\uv\data\python`。
 
-The Python installation directory may be overridden with `$UV_PYTHON_INSTALL_DIR`.
+可以通过 `$UV_PYTHON_INSTALL_DIR` 覆盖 Python 安装目录。
 
-To view the directory where uv installs Python executables instead, use the `--bin` flag. Note that Python executables are only installed when preview mode is enabled.
+要查看 uv 安装 Python 可执行文件的目录，请使用 `--bin` 标志。请注意，Python 可执行文件仅在预览模式启用时安装。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -5362,7 +5352,7 @@ uv python dir [OPTIONS]
 
 ### uv python uninstall
 
-Uninstall Python versions
+卸载 Python 版本
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -5492,7 +5482,7 @@ uv python uninstall [OPTIONS] <TARGETS>...
 
 ## uv pip
 
-Manage Python packages with a pip-compatible interface
+使用与 pip 兼容的接口管理 Python 包
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -5524,7 +5514,7 @@ uv pip [OPTIONS] <COMMAND>
 
 ### uv pip compile
 
-Compile a `requirements.in` file to a `requirements.txt` file
+将 `requirements.in` 文件编译为 `requirements.txt` 文件
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -6006,7 +5996,7 @@ uv pip compile [OPTIONS] <SRC_FILE>...
 
 ### uv pip sync
 
-Sync an environment with a `requirements.txt` file
+使用 `requirements.txt` 文件同步环境
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -6406,7 +6396,7 @@ uv pip sync [OPTIONS] <SRC_FILE>...
 
 ### uv pip install
 
-Install packages into an environment
+将包安装到环境中
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -6890,7 +6880,7 @@ uv pip install [OPTIONS] <PACKAGE|--requirements <REQUIREMENTS>|--editable <EDIT
 
 ### uv pip uninstall
 
-Uninstall packages from an environment
+从环境中卸载 packages
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -7054,7 +7044,7 @@ uv pip uninstall [OPTIONS] <PACKAGE|--requirements <REQUIREMENTS>>
 
 ### uv pip freeze
 
-List, in requirements format, packages installed in an environment
+以 requirements 格式列出环境中已安装的 packages
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -7191,7 +7181,7 @@ uv pip freeze [OPTIONS]
 
 ### uv pip list
 
-List, in tabular format, packages installed in an environment
+以表格形式列出环境中已安装的 packages
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -7416,7 +7406,7 @@ uv pip list [OPTIONS]
 
 ### uv pip show
 
-Show information about one or more installed packages
+显示一个或多个已安装包的信息
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -7557,7 +7547,7 @@ uv pip show [OPTIONS] [PACKAGE]...
 
 ### uv pip tree
 
-Display the dependency tree for an environment
+显示环境的依赖树
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -7775,7 +7765,7 @@ uv pip tree [OPTIONS]
 
 ### uv pip check
 
-Verify installed packages have compatible dependencies
+验证已安装的包是否具有兼容的依赖关系
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -7906,15 +7896,15 @@ uv pip check [OPTIONS]
 
 ## uv venv
 
-Create a virtual environment.
+创建虚拟环境。
 
-By default, creates a virtual environment named `.venv` in the working directory. An alternative path may be provided positionally.
+默认情况下，会在工作目录中创建一个名为 `.venv` 的虚拟环境。也可以通过位置参数提供其他路径。
 
-If in a project, the default environment name can be changed with the `UV_PROJECT_ENVIRONMENT` environment variable; this only applies when run from the project root directory.
+如果在项目中，可以通过 `UV_PROJECT_ENVIRONMENT` 环境变量更改默认的环境名称；这仅在从项目根目录运行时生效。
 
-If a virtual environment exists at the target path, it will be removed and a new, empty virtual environment will be created.
+如果目标路径已存在虚拟环境，它将被移除，并创建一个新的空虚拟环境。
 
-When using uv, the virtual environment does not need to be activated. uv will find a virtual environment (named `.venv`) in the working directory or any parent directories.
+使用 uv 时，无需激活虚拟环境。uv 会在工作目录或任何父目录中查找名为 `.venv` 的虚拟环境。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -8173,15 +8163,15 @@ uv venv [OPTIONS] [PATH]
 
 ## uv build
 
-Build Python packages into source distributions and wheels.
+将 Python 包构建为源码分发版和 wheel 包。
 
-`uv build` accepts a path to a directory or source distribution, which defaults to the current working directory.
+`uv build` 接受一个目录或源码分发版的路径，默认为当前工作目录。
 
-By default, if passed a directory, `uv build` will build a source distribution ("sdist") from the source directory, and a binary distribution ("wheel") from the source distribution.
+默认情况下，如果传入一个目录，`uv build` 将从源码目录构建源码分发版（"sdist"），并从源码分发版构建二进制分发版（"wheel"）。
 
-`uv build --sdist` can be used to build only the source distribution, `uv build --wheel` can be used to build only the binary distribution, and `uv build --sdist --wheel` can be used to build both distributions from source.
+`uv build --sdist` 可用于仅构建源码分发版，`uv build --wheel` 可用于仅构建二进制分发版，`uv build --sdist --wheel` 可用于从源码同时构建两种分发版。
 
-If passed a source distribution, `uv build --wheel` will build a wheel from the source distribution.
+如果传入一个源码分发版，`uv build --wheel` 将从该源码分发版构建 wheel 包。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -8531,7 +8521,7 @@ uv build [OPTIONS] [SRC]
 
 ## uv publish
 
-Upload distributions to an index
+将distributions上传至index
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -8721,7 +8711,7 @@ With these settings, the following two calls are equivalent:</code></pre>
 
 ## uv cache
 
-Manage uv's cache
+管理 uv 的缓存
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -8741,7 +8731,7 @@ uv cache [OPTIONS] <COMMAND>
 
 ### uv cache clean
 
-Clear the cache, removing all entries or those linked to specific packages
+清理缓存，移除所有条目或与特定包相关的条目
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -8864,7 +8854,7 @@ uv cache clean [OPTIONS] [PACKAGE]...
 
 ### uv cache prune
 
-Prune all unreachable objects from the cache
+清理缓存中所有不可达的对象
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -8987,15 +8977,15 @@ uv cache prune [OPTIONS]
 
 ### uv cache dir
 
-Show the cache directory.
+显示缓存目录。
 
-By default, the cache is stored in `$XDG_CACHE_HOME/uv` or `$HOME/.cache/uv` on Unix and `%LOCALAPPDATA%\uv\cache` on Windows.
+默认情况下，缓存存储在 Unix 系统的 `$XDG_CACHE_HOME/uv` 或 `$HOME/.cache/uv` 中，以及 Windows 系统的 `%LOCALAPPDATA%\uv\cache` 中。
 
-When `--no-cache` is used, the cache is stored in a temporary directory and discarded when the process exits.
+当使用 `--no-cache` 时，缓存将存储在临时目录中，并在进程退出时丢弃。
 
-An alternative cache directory may be specified via the `cache-dir` setting, the `--cache-dir` option, or the `$UV_CACHE_DIR` environment variable.
+可以通过 `cache-dir` 设置、`--cache-dir` 选项或 `$UV_CACHE_DIR` 环境变量指定替代的缓存目录。
 
-Note that it is important for performance for the cache directory to be located on the same file system as the Python environment uv is operating on.
+请注意，为了性能考虑，缓存目录应位于与 uv 操作的 Python 环境相同的文件系统上。
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -9112,7 +9102,7 @@ uv cache dir [OPTIONS]
 
 ## uv self
 
-Manage the uv executable
+管理 uv 可执行文件
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -9128,7 +9118,7 @@ uv self [OPTIONS] <COMMAND>
 
 ### uv self update
 
-Update uv
+更新 uv
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -9254,7 +9244,7 @@ uv self update [OPTIONS] [TARGET_VERSION]
 
 ## uv version
 
-Display uv's version
+显示 uv 的版本
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -9371,7 +9361,7 @@ uv version [OPTIONS]
 
 ## uv generate-shell-completion
 
-Generate shell completion
+生成 shell 自动补全
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -9416,7 +9406,7 @@ uv generate-shell-completion [OPTIONS] <SHELL>
 
 ## uv help
 
-Display documentation for a command
+显示命令的文档
 
 <h3 class="cli-reference">Usage</h3>
 

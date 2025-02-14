@@ -1,26 +1,16 @@
-# Building distributions
+# 构建分发文件
 
-To distribute your project to others (e.g., to upload it to an index like PyPI), you'll need to
-build it into a distributable format.
+要将你的项目分发给其他人（例如上传到 PyPI 等索引），你需要将其构建为可分发的格式。
 
-Python projects are typically distributed as both source distributions (sdists) and binary
-distributions (wheels). The former is typically a `.tar.gz` or `.zip` file containing the project's
-source code along with some additional metadata, while the latter is a `.whl` file containing
-pre-built artifacts that can be installed directly.
+Python 项目通常以源代码分发（sdists）和二进制分发（wheels）两种形式分发。前者通常是一个包含项目源代码以及一些额外元数据的 `.tar.gz` 或 `.zip` 文件，而后者是一个包含预构建工件的 `.whl` 文件，可以直接安装。
 
 !!! important
 
-    When using `uv build`, uv acts as a [build frontend](https://peps.python.org/pep-0517/#terminology-and-goals)
-    and only determines the Python version to use and invokes the build backend. The details of
-    the builds, such as the included files and the distribution filenames, are determined by the build
-    backend, as defined in [`[build-system]`](./config.md#build-systems). Information about build
-    configuration can be found in the respective tool's documentation.
+    使用 `uv build` 时，uv 作为 [build frontend](https://peps.python.org/pep-0517/#terminology-and-goals)，仅确定要使用的 Python 版本并调用 build backend。构建的详细信息，例如包含的文件和分发文件名，由 build backend 决定，如 [`[build-system]`](./config.md#build-systems) 中所定义。有关构建配置的信息可以在相应工具的文档中找到。
 
-## Using `uv build`
+## 使用 `uv build`
 
-`uv build` can be used to build both source distributions and binary distributions for your project.
-By default, `uv build` will build the project in the current directory, and place the built
-artifacts in a `dist/` subdirectory:
+`uv build` 可用于为你的项目构建源代码分发和二进制分发。默认情况下，`uv build` 会在当前目录下构建项目，并将构建的工件放置在 `dist/` 子目录中：
 
 ```console
 $ uv build
@@ -29,30 +19,23 @@ example-0.1.0-py3-none-any.whl
 example-0.1.0.tar.gz
 ```
 
-You can build the project in a different directory by providing a path to `uv build`, e.g.,
-`uv build path/to/project`.
+你可以通过提供路径来在不同的目录中构建项目，例如 `uv build path/to/project`。
 
-`uv build` will first build a source distribution, and then build a binary distribution (wheel) from
-that source distribution.
+`uv build` 会首先构建一个源代码分发，然后从该源代码分发构建一个二进制分发（wheel）。
 
-You can limit `uv build` to building a source distribution with `uv build --sdist`, a binary
-distribution with `uv build --wheel`, or build both distributions from source with
-`uv build --sdist --wheel`.
+你可以通过 `uv build --sdist` 限制 `uv build` 仅构建源代码分发，通过 `uv build --wheel` 仅构建二进制分发，或者通过 `uv build --sdist --wheel` 从源代码构建两种分发。
 
-## Build constraints
+## 构建约束
 
-`uv build` accepts `--build-constraint`, which can be used to constrain the versions of any build
-requirements during the build process. When coupled with `--require-hashes`, uv will enforce that
-the requirement used to build the project match specific, known hashes, for reproducibility.
+`uv build` 接受 `--build-constraint`，可用于在构建过程中约束任何构建需求的版本。当与 `--require-hashes` 结合使用时，uv 将确保用于构建项目的需求与特定的已知哈希值匹配，以实现可重复性。
 
-For example, given the following `constraints.txt`:
+例如，给定以下 `constraints.txt`：
 
 ```text
 setuptools==68.2.2 --hash=sha256:b454a35605876da60632df1a60f736524eb73cc47bbc9f3f1ef1b644de74fd2a
 ```
 
-Running the following would build the project with the specified version of `setuptools`, and verify
-that the downloaded `setuptools` distribution matches the specified hash:
+运行以下命令将使用指定版本的 `setuptools` 构建项目，并验证下载的 `setuptools` 分发是否与指定的哈希值匹配：
 
 ```console
 $ uv build --build-constraint constraints.txt --require-hashes

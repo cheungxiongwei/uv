@@ -1,21 +1,18 @@
-# First steps with uv
+# 使用uv的第一步
 
-After [installing uv](./installation.md), you can check that uv is available by running the `uv`
-command:
+在[安装uv](./installation.md)之后，你可以通过运行`uv`命令来确认uv已成功安装：
 
 ```console
 $ uv
-An extremely fast Python package manager.
+一个极其快速的Python包管理工具。
 
 Usage: uv [OPTIONS] <COMMAND>
 
 ...
 ```
 
-You should see a help menu listing the available commands.
+你应该会看到一个帮助菜单，列出所有可用的命令。
 
-## Next steps
+## 下一步
 
-Now that you've confirmed uv is installed, check out an [overview of features](./features.md), learn
-how to [get help](./help.md) if you run into any problems, or jump to the
-[guides](../guides/index.md) to start using uv.
+确认uv已安装后，你可以查看[功能概览](./features.md)，了解如何在遇到问题时[获取帮助](./help.md)，或直接进入[指南](../guides/index.md)开始使用uv。

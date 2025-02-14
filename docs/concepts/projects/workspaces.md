@@ -1,32 +1,22 @@
-# Using workspaces
+# 使用工作区
 
-Inspired by the [Cargo](https://doc.rust-lang.org/cargo/reference/workspaces.html) concept of the
-same name, a workspace is "a collection of one or more packages, called _workspace members_, that
-are managed together."
+受 [Cargo](https://doc.rust-lang.org/cargo/reference/workspaces.html) 同名概念的启发，工作区是“一个或多个包的集合，称为_工作区成员_，它们被一起管理。”
 
-Workspaces organize large codebases by splitting them into multiple packages with common
-dependencies. Think: a FastAPI-based web application, alongside a series of libraries that are
-versioned and maintained as separate Python packages, all in the same Git repository.
+工作区通过将大型代码库拆分为具有共同依赖的多个包来组织代码。例如：一个基于 FastAPI 的 Web 应用程序，以及一系列作为独立 Python 包版本化和维护的库，所有这些都在同一个 Git 仓库中。
 
-In a workspace, each package defines its own `pyproject.toml`, but the workspace shares a single
-lockfile, ensuring that the workspace operates with a consistent set of dependencies.
+在工作区中，每个包都定义了自己的 `pyproject.toml`，但工作区共享一个锁文件，确保工作区使用一致的依赖集。
 
-As such, `uv lock` operates on the entire workspace at once, while `uv run` and `uv sync` operate on
-the workspace root by default, though both accept a `--package` argument, allowing you to run a
-command in a particular workspace member from any workspace directory.
+因此，`uv lock` 会一次性对整个工作区进行操作，而 `uv run` 和 `uv sync` 默认在工作区根目录下运行，尽管两者都接受 `--package` 参数，允许您从任何工作区目录在特定工作区成员中运行命令。
 
-## Getting started
+## 入门指南
 
-To create a workspace, add a `tool.uv.workspace` table to a `pyproject.toml`, which will implicitly
-create a workspace rooted at that package.
+要创建工作区，请在 `pyproject.toml` 中添加 `tool.uv.workspace` 表，这将隐式地在该包下创建一个工作区。
 
 !!! tip
 
-    By default, running `uv init` inside an existing package will add the newly created member to the workspace, creating a `tool.uv.workspace` table in the workspace root if it doesn't already exist.
+    默认情况下，在现有包中运行 `uv init` 会将新创建的成员添加到工作区中，如果工作区根目录中尚不存在 `tool.uv.workspace` 表，则会创建它。
 
-In defining a workspace, you must specify the `members` (required) and `exclude` (optional) keys,
-which direct the workspace to include or exclude specific directories as members respectively, and
-accept lists of globs:
+在定义工作区时，您必须指定 `members`（必需）和 `exclude`（可选）键，它们分别指示工作区包含或排除特定目录作为成员，并接受 glob 列表：
 
 ```toml title="pyproject.toml"
 [project]
@@ -43,23 +33,15 @@ members = ["packages/*"]
 exclude = ["packages/seeds"]
 ```
 
-Every directory included by the `members` globs (and not excluded by the `exclude` globs) must
-contain a `pyproject.toml` file. However, workspace members can be _either_
-[applications](./init.md#applications) or [libraries](./init.md#libraries); both are supported in
-the workspace context.
+由 `members` glob 包含（且未被 `exclude` glob 排除）的每个目录都必须包含一个 `pyproject.toml` 文件。然而，工作区成员可以是[应用程序](./init.md#applications)或[库](./init.md#libraries)；两者都在工作区上下文中受支持。
 
-Every workspace needs a root, which is _also_ a workspace member. In the above example, `albatross`
-is the workspace root, and the workspace members include all projects under the `packages`
-directory, with the exception of `seeds`.
+每个工作区都需要一个根目录，它_也_是一个工作区成员。在上面的示例中，`albatross` 是工作区根目录，工作区成员包括 `packages` 目录下的所有项目，但 `seeds` 除外。
 
-By default, `uv run` and `uv sync` operates on the workspace root. For example, in the above
-example, `uv run` and `uv run --package albatross` would be equivalent, while
-`uv run --package bird-feeder` would run the command in the `bird-feeder` package.
+默认情况下，`uv run` 和 `uv sync` 在工作区根目录下运行。例如，在上面的示例中，`uv run` 和 `uv run --package albatross` 是等价的，而 `uv run --package bird-feeder` 将在 `bird-feeder` 包中运行命令。
 
-## Workspace sources
+## 工作区源
 
-Within a workspace, dependencies on workspace members are facilitated via
-[`tool.uv.sources`](./dependencies.md), as in:
+在工作区内，通过 [`tool.uv.sources`](./dependencies.md) 实现工作区成员之间的依赖关系，例如：
 
 ```toml title="pyproject.toml"
 [project]
@@ -79,17 +61,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 ```
 
-In this example, the `albatross` project depends on the `bird-feeder` project, which is a member of
-the workspace. The `workspace = true` key-value pair in the `tool.uv.sources` table indicates the
-`bird-feeder` dependency should be provided by the workspace, rather than fetched from PyPI or
-another registry.
+在此示例中，`albatross` 项目依赖于 `bird-feeder` 项目，后者是工作区的成员。`tool.uv.sources` 表中的 `workspace = true` 键值对表示 `bird-feeder` 依赖应由工作区提供，而不是从 PyPI 或其他注册表获取。
 
 !!! note
 
-    Dependencies between workspace members are editable.
+    工作区成员之间的依赖是可编辑的。
 
-Any `tool.uv.sources` definitions in the workspace root apply to all members, unless overridden in
-the `tool.uv.sources` of a specific member. For example, given the following `pyproject.toml`:
+工作区根目录中的任何 `tool.uv.sources` 定义都适用于所有成员，除非在特定成员的 `tool.uv.sources` 中被覆盖。例如，给定以下 `pyproject.toml`：
 
 ```toml title="pyproject.toml"
 [project]
@@ -110,16 +88,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 ```
 
-Every workspace member would, by default, install `tqdm` from GitHub, unless a specific member
-overrides the `tqdm` entry in its own `tool.uv.sources` table.
+默认情况下，每个工作区成员将从 GitHub 安装 `tqdm`，除非特定成员在其自己的 `tool.uv.sources` 表中覆盖 `tqdm` 条目。
 
-## Workspace layouts
+## 工作区布局
 
-The most common workspace layout can be thought of as a root project with a series of accompanying
-libraries.
+最常见的工作区布局可以被视为一个根项目及其伴随的一系列库。
 
-For example, continuing with the above example, this workspace has an explicit root at `albatross`,
-with two libraries (`bird-feeder` and `seeds`) in the `packages` directory:
+例如，继续上面的示例，此工作区在 `albatross` 处有一个显式根目录，`packages` 目录中有两个库（`bird-feeder` 和 `seeds`）：
 
 ```text
 albatross
@@ -144,31 +119,20 @@ albatross
         └── main.py
 ```
 
-Since `seeds` was excluded in the `pyproject.toml`, the workspace has two members total: `albatross`
-(the root) and `bird-feeder`.
+由于 `seeds` 在 `pyproject.toml` 中被排除，工作区共有两个成员：`albatross`（根目录）和 `bird-feeder`。
 
-## When (not) to use workspaces
+## 何时（不）使用工作区
 
-Workspaces are intended to facilitate the development of multiple interconnected packages within a
-single repository. As a codebase grows in complexity, it can be helpful to split it into smaller,
-composable packages, each with their own dependencies and version constraints.
+工作区旨在促进单个仓库中多个相互关联的包的开发。随着代码库复杂性的增加，将其拆分为更小、可组合的包，每个包都有自己的依赖和版本约束，可能会有所帮助。
 
-Workspaces help enforce isolation and separation of concerns. For example, in uv, we have separate
-packages for the core library and the command-line interface, enabling us to test the core library
-independently of the CLI, and vice versa.
+工作区有助于强制隔离和关注点分离。例如，在 uv 中，我们有核心库和命令行接口的独立包，使我们能够独立于 CLI 测试核心库，反之亦然。
 
-Other common use cases for workspaces include:
+工作区的其他常见用例包括：
 
-- A library with a performance-critical subroutine implemented in an extension module (Rust, C++,
-  etc.).
-- A library with a plugin system, where each plugin is a separate workspace package with a
-  dependency on the root.
+- 一个库，其性能关键的子例程在扩展模块（Rust、C++ 等）中实现。
+- 一个具有插件系统的库，其中每个插件都是一个独立的工作区包，依赖于根目录。
 
-Workspaces are _not_ suited for cases in which members have conflicting requirements, or desire a
-separate virtual environment for each member. In this case, path dependencies are often preferable.
-For example, rather than grouping `albatross` and its members in a workspace, you can always define
-each package as its own independent project, with inter-package dependencies defined as path
-dependencies in `tool.uv.sources`:
+工作区_不_适用于成员有冲突需求或希望为每个成员使用单独虚拟环境的情况。在这种情况下，路径依赖通常是更可取的。例如，与其将 `albatross` 及其成员分组到一个工作区中，您始终可以将每个包定义为其独立的项目，并在 `tool.uv.sources` 中定义包间依赖为路径依赖：
 
 ```toml title="pyproject.toml"
 [project]
@@ -185,15 +149,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 ```
 
-This approach conveys many of the same benefits, but allows for more fine-grained control over
-dependency resolution and virtual environment management (with the downside that `uv run --package`
-is no longer available; instead, commands must be run from the relevant package directory).
+这种方法传达了许多相同的优点，但允许更细粒度地控制依赖解析和虚拟环境管理（缺点是 `uv run --package` 不再可用；相反，必须从相关包目录运行命令）。
 
-Finally, uv's workspaces enforce a single `requires-python` for the entire workspace, taking the
-intersection of all members' `requires-python` values. If you need to support testing a given member
-on a Python version that isn't supported by the rest of the workspace, you may need to use `uv pip`
-to install that member in a separate virtual environment.
+最后，uv 的工作区强制整个工作区使用单一的 `requires-python`，取所有成员的 `requires-python` 值的交集。如果您需要支持在不受工作区其他成员支持的 Python 版本上测试某个成员，则可能需要使用 `uv pip` 将该成员安装到单独的虚拟环境中。
 
 !!! note
 
-    As Python does not provide dependency isolation, uv can't ensure that a package uses its declared dependencies and nothing else. For workspaces specifically, uv can't ensure that packages don't import dependencies declared by another workspace member.
+    由于 Python 不提供依赖隔离，uv 无法确保包使用其声明的依赖而不使用其他内容。对于工作区，uv 无法确保包不会导入另一个工作区成员声明的依赖。

@@ -5,70 +5,68 @@ description:
   compile requirements files.
 ---
 
-# Using uv in pre-commit
+# 在 pre-commit 中使用 uv
 
-An official pre-commit hook is provided at
-[`astral-sh/uv-pre-commit`](https://github.com/astral-sh/uv-pre-commit).
+官方提供了一个 pre-commit 钩子，位于 [`astral-sh/uv-pre-commit`](https://github.com/astral-sh/uv-pre-commit)。
 
-To make sure your `uv.lock` file is up to date even if your `pyproject.toml` file was changed via
-pre-commit, add the following to the `.pre-commit-config.yaml`:
+为了确保即使通过 pre-commit 更改了 `pyproject.toml` 文件，`uv.lock` 文件也能保持最新，请将以下内容添加到 `.pre-commit-config.yaml` 中：
 
 ```yaml title=".pre-commit-config.yaml"
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
-    # uv version.
+    # uv 版本。
     rev: 0.5.30
     hooks:
       - id: uv-lock
 ```
 
-To keep your `requirements.txt` file updated using pre-commit:
+为了使用 pre-commit 保持 `requirements.txt` 文件更新：
 
 ```yaml title=".pre-commit-config.yaml"
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
-    # uv version.
+    # uv 版本。
     rev: 0.5.30
     hooks:
       - id: uv-export
 ```
 
-To compile requirements via pre-commit, add the following to the `.pre-commit-config.yaml`:
+为了通过 pre-commit 编译 requirements，请将以下内容添加到 `.pre-commit-config.yaml` 中：
 
 ```yaml title=".pre-commit-config.yaml"
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
-    # uv version.
+    # uv 版本。
     rev: 0.5.30
     hooks:
-      # Compile requirements
+      # 编译 requirements
       - id: pip-compile
         args: [requirements.in, -o, requirements.txt]
 ```
 
-To compile alternative files, modify `args` and `files`:
+要编译其他文件，请修改 `args` 和 `files`：
 
 ```yaml title=".pre-commit-config.yaml"
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
-    # uv version.
+    # uv 版本。
     rev: 0.5.30
     hooks:
-      # Compile requirements
+      # 编译 requirements
       - id: pip-compile
         args: [requirements-dev.in, -o, requirements-dev.txt]
         files: ^requirements-dev\.(in|txt)$
 ```
 
-To run the hook over multiple files at the same time:
+要同时运行多个文件的钩子：
 
 ```yaml title=".pre-commit-config.yaml"
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
-    # uv version.
+    # uv 版本。
     rev: 0.5.30
     hooks:
-      # Compile requirements
+      # 编译 requirements
       - id: pip-compile
         name: pip-compile requirements.in
         args: [requirements.in, -o, requirements.txt]

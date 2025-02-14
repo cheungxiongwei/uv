@@ -1,6 +1,6 @@
-# Concepts overview
+# 概念概述
 
-Read the concept documents to learn more about uv's features:
+阅读概念文档以了解更多关于 uv 的功能：
 
 - [Projects](./projects/index.md)
 - [Tools](./tools.md)
@@ -8,4 +8,4 @@ Read the concept documents to learn more about uv's features:
 - [Resolution](./resolution.md)
 - [Caching](./cache.md)
 
-Looking for a quick introduction to features? See the [guides](../guides/index.md) instead.
+想要快速了解功能？请参阅[指南](../guides/index.md)。

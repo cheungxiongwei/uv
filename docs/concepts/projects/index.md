@@ -1,18 +1,18 @@
-# Projects
+# 项目
 
-Projects help manage Python code spanning multiple files.
+项目帮助管理跨多个文件的 Python 代码。
 
 !!! tip
 
-    Looking for an introduction to creating a project with uv? See the [projects guide](../../guides/projects.md) first.
+    想要了解如何使用 uv 创建项目？请先查看[项目指南](../../guides/projects.md)。
 
-Working on projects is a core part of the uv experience. Learn more about using projects:
+项目开发是 uv 体验的核心部分。了解更多关于使用项目的信息：
 
-- [Understanding project structure and files](./layout.md)
-- [Creating new projects](./init.md)
-- [Managing project dependencies](./dependencies.md)
-- [Running commands and scripts in a project](./run.md)
-- [Using lockfiles and syncing the environment](./sync.md)
-- [Configuring the project for advanced use cases](./config.md)
-- [Building distributions to publish a project](./build.md)
-- [Using workspaces to work on multiple projects at once](./workspaces.md)
+- [理解项目结构和文件](./layout.md)
+- [创建新项目](./init.md)
+- [管理项目依赖](./dependencies.md)
+- [在项目中运行命令和脚本](./run.md)
+- [使用 lockfile 并同步环境](./sync.md)
+- [为高级用例配置项目](./config.md)
+- [构建发布项目的分发包](./build.md)
+- [使用工作区同时处理多个项目](./workspaces.md)

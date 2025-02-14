@@ -1,14 +1,13 @@
-# Configuring the uv installer
+# 配置 uv 安装程序
 
-## Changing the install path
+## 更改安装路径
 
-By default, uv is installed to `~/.local/bin`. If `XDG_BIN_HOME` is set, it will be used instead.
-Similarly, if `XDG_DATA_HOME` is set, the target directory will be inferred as
-`XDG_DATA_HOME/../bin`.
+默认情况下，uv 会安装到 `~/.local/bin`。如果设置了 `XDG_BIN_HOME`，则会使用该路径。
+同样，如果设置了 `XDG_DATA_HOME`，目标目录将推断为 `XDG_DATA_HOME/../bin`。
 
-To change the installation path, use `UV_INSTALL_DIR`:
+要更改安装路径，请使用 `UV_INSTALL_DIR`：
 
-=== "macOS and Linux"
+=== "macOS 和 Linux"
 
     ```console
     $ curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/custom/path" sh
@@ -20,33 +19,32 @@ To change the installation path, use `UV_INSTALL_DIR`:
     powershell -ExecutionPolicy ByPass -c {$env:UV_INSTALL_DIR = "C:\Custom\Path";irm https://astral.sh/uv/install.ps1 | iex}
     ```
 
-## Disabling shell modifications
+## 禁用 shell 修改
 
-The installer may also update your shell profiles to ensure the uv binary is on your `PATH`. To
-disable this behavior, use `INSTALLER_NO_MODIFY_PATH`. For example:
+安装程序可能还会更新您的 shell 配置文件，以确保 uv 二进制文件在您的 `PATH` 中。要
+禁用此行为，请使用 `INSTALLER_NO_MODIFY_PATH`。例如：
 
 ```console
 $ curl -LsSf https://astral.sh/uv/install.sh | env INSTALLER_NO_MODIFY_PATH=1 sh
 ```
 
-If installed with `INSTALLER_NO_MODIFY_PATH`, subsequent operations, like `uv self update`, will not
-modify your shell profiles.
+如果使用 `INSTALLER_NO_MODIFY_PATH` 安装，后续操作（如 `uv self update`）将不会
+修改您的 shell 配置文件。
 
-## Unmanaged installations
+## 非托管安装
 
-In ephemeral environments like CI, use `UV_UNMANAGED_INSTALL` to install uv to a specific path while
-preventing the installer from modifying shell profiles or environment variables:
+在 CI 等临时环境中，使用 `UV_UNMANAGED_INSTALL` 将 uv 安装到特定路径，同时
+防止安装程序修改 shell 配置文件或环境变量：
 
 ```console
 $ curl -LsSf https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL="/custom/path" sh
 ```
 
-The use of `UV_UNMANAGED_INSTALL` will also disable self-updates (via `uv self update`).
+使用 `UV_UNMANAGED_INSTALL` 还会禁用自更新（通过 `uv self update`）。
 
-## Passing options to the install script
+## 向安装脚本传递选项
 
-Using environment variables is recommended because they are consistent across platforms. However,
-options can be passed directly to the install script. For example, to see the available options:
+建议使用环境变量，因为它们在各个平台上是一致的。但是，也可以直接向安装脚本传递选项。例如，查看可用选项：
 
 ```console
 $ curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --help

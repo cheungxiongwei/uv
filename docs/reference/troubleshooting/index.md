@@ -1,7 +1,6 @@
-# Troubleshooting
+# 故障排除
 
-The troubleshooting section provides information about investigating failures in uv:
+故障排除部分提供了有关调查 uv 失败的信息：
 
-- [Build failures](./build-failures.md): Understanding common causes of package build failures.
-- [Reproducible examples](./reproducible-examples.md): How to write a minimal reproducible example
-  for a uv issue.
+- [构建失败](./build-failures.md)：了解包构建失败的常见原因。
+- [可复现示例](./reproducible-examples.md)：如何为 uv 问题编写最小可复现示例。

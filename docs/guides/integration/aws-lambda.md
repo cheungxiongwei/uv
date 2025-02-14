@@ -5,22 +5,19 @@ description:
   functions via Docker containers or zip archives.
 ---
 
-# Using uv with AWS Lambda
+# 使用 uv 与 AWS Lambda
 
-[AWS Lambda](https://aws.amazon.com/lambda/) is a serverless computing service that lets you run
-code without provisioning or managing servers.
+[AWS Lambda](https://aws.amazon.com/lambda/) 是一种无服务器计算服务，允许您运行代码而无需预置或管理服务器。
 
-You can use uv with AWS Lambda to manage your Python dependencies, build your deployment package,
-and deploy your Lambda functions.
+您可以使用 uv 与 AWS Lambda 来管理 Python 依赖项、构建部署包并部署 Lambda 函数。
 
 !!! tip
 
-    Check out the [`uv-aws-lambda-example`](https://github.com/astral-sh/uv-aws-lambda-example) project for
-    an example of best practices when using uv to deploy an application to AWS Lambda.
+    查看 [`uv-aws-lambda-example`](https://github.com/astral-sh/uv-aws-lambda-example) 项目，了解使用 uv 将应用程序部署到 AWS Lambda 的最佳实践示例。
 
-## Getting started
+## 入门指南
 
-To start, assume we have a minimal FastAPI application with the following structure:
+首先，假设我们有一个最小的 FastAPI 应用程序，结构如下：
 
 ```plaintext
 project
@@ -30,7 +27,7 @@ project
     └── main.py
 ```
 
-Where the `pyproject.toml` contains:
+其中 `pyproject.toml` 包含：
 
 ```toml title="pyproject.toml"
 [project]
@@ -38,20 +35,20 @@ name = "uv-aws-lambda-example"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
-    # FastAPI is a modern web framework for building APIs with Python.
+    # FastAPI 是一个用于构建 API 的现代 Python Web 框架。
     "fastapi",
-    # Mangum is a library that adapts ASGI applications to AWS Lambda and API Gateway.
+    # Mangum 是一个将 ASGI 应用程序适配到 AWS Lambda 和 API Gateway 的库。
     "mangum",
 ]
 
 [dependency-groups]
 dev = [
-    # In development mode, include the FastAPI development server.
+    # 在开发模式下，包含 FastAPI 开发服务器。
     "fastapi[standard]>=0.115",
 ]
 ```
 
-And the `main.py` file contains:
+而 `main.py` 文件包含：
 
 ```python title="app/main.py"
 import logging
@@ -71,46 +68,41 @@ async def root() -> str:
     return "Hello, world!"
 ```
 
-We can run this application locally with:
+我们可以通过以下命令在本地运行此应用程序：
 
 ```console
 $ uv run fastapi dev
 ```
 
-From there, opening http://127.0.0.1:8000/ in a web browser will display "Hello, world!"
+然后，在浏览器中打开 http://127.0.0.1:8000/ 将显示 "Hello, world!"
 
-## Deploying a Docker image
+## 部署 Docker 镜像
 
-To deploy to AWS Lambda, we need to build a container image that includes the application code and
-dependencies in a single output directory.
+要部署到 AWS Lambda，我们需要构建一个包含应用程序代码和依赖项的容器镜像。
 
-We'll follow the principles outlined in the [Docker guide](./docker.md) (in particular, a
-multi-stage build) to ensure that the final image is as small and cache-friendly as possible.
+我们将遵循 [Docker 指南](./docker.md) 中概述的原则（特别是多阶段构建），以确保最终镜像尽可能小且缓存友好。
 
-In the first stage, we'll populate a single directory with all application code and dependencies. In
-the second stage, we'll copy this directory over to the final image, omitting the build tools and
-other unnecessary files.
+在第一阶段，我们将所有应用程序代码和依赖项打包到一个目录中。在第二阶段，我们将此目录复制到最终镜像中，省略构建工具和其他不必要的文件。
 
 ```dockerfile title="Dockerfile"
 FROM ghcr.io/astral-sh/uv:0.5.30 AS uv
 
-# First, bundle the dependencies into the task root.
+# 首先，将依赖项打包到任务根目录。
 FROM public.ecr.aws/lambda/python:3.13 AS builder
 
-# Enable bytecode compilation, to improve cold-start performance.
+# 启用字节码编译，以提高冷启动性能。
 ENV UV_COMPILE_BYTECODE=1
 
-# Disable installer metadata, to create a deterministic layer.
+# 禁用安装程序元数据，以创建确定性层。
 ENV UV_NO_INSTALLER_METADATA=1
 
-# Enable copy mode to support bind mount caching.
+# 启用复制模式以支持绑定挂载缓存。
 ENV UV_LINK_MODE=copy
 
-# Bundle the dependencies into the Lambda task root via `uv pip install --target`.
+# 通过 `uv pip install --target` 将依赖项打包到 Lambda 任务根目录。
 #
-# Omit any local packages (`--no-emit-workspace`) and development dependencies (`--no-dev`).
-# This ensures that the Docker layer cache is only invalidated when the `pyproject.toml` or `uv.lock`
-# files change, but remains robust to changes in the application code.
+# 省略任何本地包 (`--no-emit-workspace`) 和开发依赖项 (`--no-dev`)。
+# 这确保 Docker 层缓存仅在 `pyproject.toml` 或 `uv.lock` 文件更改时失效，但在应用程序代码更改时保持稳健。
 RUN --mount=from=uv,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -120,37 +112,33 @@ RUN --mount=from=uv,source=/uv,target=/bin/uv \
 
 FROM public.ecr.aws/lambda/python:3.13
 
-# Copy the runtime dependencies from the builder stage.
+# 从构建阶段复制运行时依赖项。
 COPY --from=builder ${LAMBDA_TASK_ROOT} ${LAMBDA_TASK_ROOT}
 
-# Copy the application code.
+# 复制应用程序代码。
 COPY ./app ${LAMBDA_TASK_ROOT}/app
 
-# Set the AWS Lambda handler.
+# 设置 AWS Lambda 处理程序。
 CMD ["app.main.handler"]
 ```
 
 !!! tip
 
-    To deploy to ARM-based AWS Lambda runtimes, replace `public.ecr.aws/lambda/python:3.13` with `public.ecr.aws/lambda/python:3.13-arm64`.
+    要部署到基于 ARM 的 AWS Lambda 运行时，请将 `public.ecr.aws/lambda/python:3.13` 替换为 `public.ecr.aws/lambda/python:3.13-arm64`。
 
-We can build the image with, e.g.:
+我们可以通过以下命令构建镜像：
 
 ```console
 $ uv lock
 $ docker build -t fastapi-app .
 ```
 
-The core benefits of this Dockerfile structure are as follows:
+此 Dockerfile 结构的核心优势如下：
 
-1. **Minimal image size.** By using a multi-stage build, we can ensure that the final image only
-   includes the application code and dependencies. For example, the uv binary itself is not included
-   in the final image.
-2. **Maximal cache reuse.** By installing application dependencies separately from the application
-   code, we can ensure that the Docker layer cache is only invalidated when the dependencies change.
+1. **镜像体积最小化。** 通过使用多阶段构建，我们可以确保最终镜像仅包含应用程序代码和依赖项。例如，uv 二进制文件本身不包含在最终镜像中。
+2. **最大化缓存重用。** 通过将应用程序依赖项与应用程序代码分开安装，我们可以确保 Docker 层缓存仅在依赖项更改时失效。
 
-Concretely, rebuilding the image after modifying the application source code can reuse the cached
-layers, resulting in millisecond builds:
+具体来说，在修改应用程序源代码后重建镜像可以重用缓存层，从而实现毫秒级构建：
 
 ```console
  => [internal] load build definition from Dockerfile                                                                 0.0s
@@ -171,8 +159,7 @@ layers, resulting in millisecond builds:
  => => writing image sha256:6f8f9ef715a7cda466b677a9df4046ebbb90c8e88595242ade3b4771f547652d                         0.0
 ```
 
-After building, we can push the image to
-[Elastic Container Registry (ECR)](https://aws.amazon.com/ecr/) with, e.g.:
+构建完成后，我们可以将镜像推送到 [Elastic Container Registry (ECR)](https://aws.amazon.com/ecr/)，例如：
 
 ```console
 $ aws ecr get-login-password --region region | docker login --username AWS --password-stdin aws_account_id.dkr.ecr.region.amazonaws.com
@@ -180,8 +167,7 @@ $ docker tag fastapi-app:latest aws_account_id.dkr.ecr.region.amazonaws.com/fast
 $ docker push aws_account_id.dkr.ecr.region.amazonaws.com/fastapi-app:latest
 ```
 
-Finally, we can deploy the image to AWS Lambda using the AWS Management Console or the AWS CLI,
-e.g.:
+最后，我们可以使用 AWS 管理控制台或 AWS CLI 将镜像部署到 AWS Lambda，例如：
 
 ```console
 $ aws lambda create-function \
@@ -191,9 +177,7 @@ $ aws lambda create-function \
    --role arn:aws:iam::111122223333:role/my-lambda-role
 ```
 
-Where the
-[execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html#permissions-executionrole-api)
-is created via:
+其中 [执行角色](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html#permissions-executionrole-api) 通过以下命令创建：
 
 ```console
 $ aws iam create-role \
@@ -201,7 +185,7 @@ $ aws iam create-role \
    --assume-role-policy-document '{"Version": "2012-10-17", "Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
 ```
 
-Or, update an existing function with:
+或者，更新现有函数：
 
 ```console
 $ aws lambda update-function-code \
@@ -210,7 +194,7 @@ $ aws lambda update-function-code \
    --publish
 ```
 
-To test the Lambda, we can invoke it via the AWS Management Console or the AWS CLI, e.g.:
+要测试 Lambda，我们可以通过 AWS 管理控制台或 AWS CLI 调用它，例如：
 
 ```console
 $ aws lambda invoke \
@@ -224,7 +208,7 @@ $ aws lambda invoke \
 }
 ```
 
-Where `event.json` contains the event payload to pass to the Lambda function:
+其中 `event.json` 包含传递给 Lambda 函数的事件负载：
 
 ```json title="event.json"
 {
@@ -235,7 +219,7 @@ Where `event.json` contains the event payload to pass to the Lambda function:
 }
 ```
 
-And `response.json` contains the response from the Lambda function:
+而 `response.json` 包含 Lambda 函数的响应：
 
 ```json title="response.json"
 {
@@ -250,27 +234,22 @@ And `response.json` contains the response from the Lambda function:
 }
 ```
 
-For details, see the
-[AWS Lambda documentation](https://docs.aws.amazon.com/lambda/latest/dg/python-image.html).
+有关详细信息，请参阅 [AWS Lambda 文档](https://docs.aws.amazon.com/lambda/latest/dg/python-image.html)。
 
-### Workspace support
+### 工作区支持
 
-If a project includes local dependencies (e.g., via
-[Workspaces](../../concepts/projects/workspaces.md), those too must be included in the deployment
-package.
+如果项目包含本地依赖项（例如通过[工作区](../../concepts/projects/workspaces.md)），这些依赖项也必须包含在部署包中。
 
-We'll start by extending the above example to include a dependency on a locally-developed library
-named `library`.
+我们将通过扩展上述示例来包含对本地开发的库`library`的依赖。
 
-First, we'll create the library itself:
+首先，我们将创建库本身：
 
 ```console
 $ uv init --lib library
 $ uv add ./library
 ```
 
-Running `uv init` within the `project` directory will automatically convert `project` to a workspace
-and add `library` as a workspace member:
+在`project`目录中运行`uv init`将自动将`project`转换为工作区，并将`library`添加为工作区成员：
 
 ```toml title="pyproject.toml"
 [project]
@@ -278,17 +257,17 @@ name = "uv-aws-lambda-example"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
-    # FastAPI is a modern web framework for building APIs with Python.
+    # FastAPI 是一个用于使用 Python 构建 API 的现代 Web 框架。
     "fastapi",
-    # A local library.
+    # 一个本地库。
     "library",
-    # Mangum is a library that adapts ASGI applications to AWS Lambda and API Gateway.
+    # Mangum 是一个将 ASGI 应用程序适配到 AWS Lambda 和 API Gateway 的库。
     "mangum",
 ]
 
 [dependency-groups]
 dev = [
-    # In development mode, include the FastAPI development server.
+    # 在开发模式下，包含 FastAPI 开发服务器。
     "fastapi[standard]",
 ]
 
@@ -299,8 +278,7 @@ members = ["library"]
 lib = { workspace = true }
 ```
 
-By default, `uv init --lib` will create a package that exports a `hello` function. We'll modify the
-application source code to call that function:
+默认情况下，`uv init --lib`将创建一个导出`hello`函数的包。我们将修改应用程序源代码以调用该函数：
 
 ```python title="app/main.py"
 import logging
@@ -322,37 +300,36 @@ async def root() -> str:
     return hello()
 ```
 
-We can run the modified application locally with:
+我们可以通过以下命令在本地运行修改后的应用程序：
 
 ```console
 $ uv run fastapi dev
 ```
 
-And confirm that opening http://127.0.0.1:8000/ in a web browser displays, "Hello from library!"
-(instead of "Hello, World!")
+并确认在浏览器中打开 http://127.0.0.1:8000/ 会显示 "Hello from library!"（而不是 "Hello, World!"）
 
-Finally, we'll update the Dockerfile to include the local library in the deployment package:
+最后，我们将更新 Dockerfile 以将本地库包含在部署包中：
 
 ```dockerfile title="Dockerfile"
 FROM ghcr.io/astral-sh/uv:0.5.30 AS uv
 
-# First, bundle the dependencies into the task root.
+# 首先，将依赖项打包到任务根目录中。
 FROM public.ecr.aws/lambda/python:3.13 AS builder
 
-# Enable bytecode compilation, to improve cold-start performance.
+# 启用字节码编译，以提高冷启动性能。
 ENV UV_COMPILE_BYTECODE=1
 
-# Disable installer metadata, to create a deterministic layer.
+# 禁用安装程序元数据，以创建确定性层。
 ENV UV_NO_INSTALLER_METADATA=1
 
-# Enable copy mode to support bind mount caching.
+# 启用复制模式以支持绑定挂载缓存。
 ENV UV_LINK_MODE=copy
 
-# Bundle the dependencies into the Lambda task root via `uv pip install --target`.
+# 通过 `uv pip install --target` 将依赖项打包到 Lambda 任务根目录中。
 #
-# Omit any local packages (`--no-emit-workspace`) and development dependencies (`--no-dev`).
-# This ensures that the Docker layer cache is only invalidated when the `pyproject.toml` or `uv.lock`
-# files change, but remains robust to changes in the application code.
+# 省略任何本地包（`--no-emit-workspace`）和开发依赖项（`--no-dev`）。
+# 这确保 Docker 层缓存仅在 `pyproject.toml` 或 `uv.lock` 文件更改时失效，
+# 但对应用程序代码的更改保持稳健。
 RUN --mount=from=uv,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -360,11 +337,10 @@ RUN --mount=from=uv,source=/uv,target=/bin/uv \
     uv export --frozen --no-emit-workspace --no-dev --no-editable -o requirements.txt && \
     uv pip install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
-# If you have a workspace, copy it over and install it too.
+# 如果你有工作区，请将其复制并安装。
 #
-# By omitting `--no-emit-workspace`, `library` will be copied into the task root. Using a separate
-# `RUN` command ensures that all third-party dependencies are cached separately and remain
-# robust to changes in the workspace.
+# 通过省略 `--no-emit-workspace`，`library` 将被复制到任务根目录中。使用单独的
+# `RUN` 命令确保所有第三方依赖项单独缓存，并对工作区的更改保持稳健。
 RUN --mount=from=uv,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -375,32 +351,27 @@ RUN --mount=from=uv,source=/uv,target=/bin/uv \
 
 FROM public.ecr.aws/lambda/python:3.13
 
-# Copy the runtime dependencies from the builder stage.
+# 从构建阶段复制运行时依赖项。
 COPY --from=builder ${LAMBDA_TASK_ROOT} ${LAMBDA_TASK_ROOT}
 
-# Copy the application code.
+# 复制应用程序代码。
 COPY ./app ${LAMBDA_TASK_ROOT}/app
 
-# Set the AWS Lambda handler.
+# 设置 AWS Lambda 处理程序。
 CMD ["app.main.handler"]
 ```
 
 !!! tip
 
-    To deploy to ARM-based AWS Lambda runtimes, replace `public.ecr.aws/lambda/python:3.13` with `public.ecr.aws/lambda/python:3.13-arm64`.
+    要部署到基于 ARM 的 AWS Lambda 运行时，请将 `public.ecr.aws/lambda/python:3.13` 替换为 `public.ecr.aws/lambda/python:3.13-arm64`。
 
-From there, we can build and deploy the updated image as before.
+从那里，我们可以像以前一样构建和部署更新后的镜像。
 
-## Deploying a zip archive
+## 部署 zip 存档
 
-AWS Lambda also supports deployment via zip archives. For simple applications, zip archives can be a
-more straightforward and efficient deployment method than Docker images; however, zip archives are
-limited to
-[250 MB](https://docs.aws.amazon.com/lambda/latest/dg/python-package.html#python-package-create-update)
-in size.
+AWS Lambda 也支持通过 zip 存档进行部署。对于简单的应用程序，zip 存档可能比 Docker 镜像更直接和高效；然而，zip 存档的大小限制为 [250 MB](https://docs.aws.amazon.com/lambda/latest/dg/python-package.html#python-package-create-update)。
 
-Returning to the FastAPI example, we can bundle the application dependencies into a local directory
-for AWS Lambda via:
+回到 FastAPI 示例，我们可以通过以下方式将应用程序依赖项打包到本地目录中以便 AWS Lambda 使用：
 
 ```console
 $ uv export --frozen --no-dev --no-editable -o requirements.txt
@@ -415,11 +386,9 @@ $ uv pip install \
 
 !!! tip
 
-    To deploy to ARM-based AWS Lambda runtimes, replace `x86_64-manylinux2014` with `aarch64-manylinux2014`.
+    要部署到基于 ARM 的 AWS Lambda 运行时，请将 `x86_64-manylinux2014` 替换为 `aarch64-manylinux2014`。
 
-Following the
-[AWS Lambda documentation](https://docs.aws.amazon.com/lambda/latest/dg/python-package.html), we can
-then bundle these dependencies into a zip as follows:
+按照 [AWS Lambda 文档](https://docs.aws.amazon.com/lambda/latest/dg/python-package.html)，我们可以将这些依赖项打包成 zip 文件，如下所示：
 
 ```console
 $ cd packages
@@ -427,14 +396,13 @@ $ zip -r ../package.zip .
 $ cd ..
 ```
 
-Finally, we can add the application code to the zip archive:
+最后，我们可以将应用程序代码添加到 zip 存档中：
 
 ```console
 $ zip -r package.zip app
 ```
 
-We can then deploy the zip archive to AWS Lambda via the AWS Management Console or the AWS CLI,
-e.g.:
+然后，我们可以通过 AWS 管理控制台或 AWS CLI 将 zip 存档部署到 AWS Lambda，例如：
 
 ```console
 $ aws lambda create-function \
@@ -445,9 +413,7 @@ $ aws lambda create-function \
    --role arn:aws:iam::111122223333:role/service-role/my-lambda-role
 ```
 
-Where the
-[execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html#permissions-executionrole-api)
-is created via:
+其中[执行角色](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html#permissions-executionrole-api)通过以下命令创建：
 
 ```console
 $ aws iam create-role \
@@ -455,7 +421,7 @@ $ aws iam create-role \
    --assume-role-policy-document '{"Version": "2012-10-17", "Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
 ```
 
-Or, update an existing function with:
+或者，更新现有函数：
 
 ```console
 $ aws lambda update-function-code \
@@ -465,11 +431,11 @@ $ aws lambda update-function-code \
 
 !!! note
 
-    By default, the AWS Management Console assumes a Lambda entrypoint of `lambda_function.lambda_handler`.
-    If your application uses a different entrypoint, you'll need to modify it in the AWS Management Console.
-    For example, the above FastAPI application uses `app.main.handler`.
+    默认情况下，AWS 管理控制台假定 Lambda 入口点为 `lambda_function.lambda_handler`。
+    如果你的应用程序使用不同的入口点，你需要在 AWS 管理控制台中修改它。
+    例如，上述 FastAPI 应用程序使用 `app.main.handler`。
 
-To test the Lambda, we can invoke it via the AWS Management Console or the AWS CLI, e.g.:
+要测试 Lambda，我们可以通过 AWS 管理控制台或 AWS CLI 调用它，例如：
 
 ```console
 $ aws lambda invoke \
@@ -483,7 +449,7 @@ $ aws lambda invoke \
 }
 ```
 
-Where `event.json` contains the event payload to pass to the Lambda function:
+其中 `event.json` 包含传递给 Lambda 函数的事件负载：
 
 ```json title="event.json"
 {
@@ -494,7 +460,7 @@ Where `event.json` contains the event payload to pass to the Lambda function:
 }
 ```
 
-And `response.json` contains the response from the Lambda function:
+而 `response.json` 包含 Lambda 函数的响应：
 
 ```json title="response.json"
 {
@@ -509,22 +475,15 @@ And `response.json` contains the response from the Lambda function:
 }
 ```
 
-### Using a Lambda layer
+### 使用 Lambda 层
 
-AWS Lambda also supports the deployment of multiple composed
-[Lambda layers](https://docs.aws.amazon.com/lambda/latest/dg/python-layers.html) when working with
-zip archives. These layers are conceptually similar to layers in a Docker image, allowing you to
-separate application code from dependencies.
+AWS Lambda 还支持在使用 zip 存档时部署多个组合的 [Lambda 层](https://docs.aws.amazon.com/lambda/latest/dg/python-layers.html)。这些层在概念上类似于 Docker 镜像中的层，允许你将应用程序代码与依赖项分离。
 
-In particular, we can create a lambda layer for application dependencies and attach it to the Lambda
-function, separate from the application code itself. This setup can improve cold-start performance
-for application updates, as the dependencies layer can be reused across deployments.
+特别是，我们可以为应用程序依赖项创建一个 Lambda 层，并将其附加到 Lambda 函数，与应用程序代码本身分开。这种设置可以提高应用程序更新的冷启动性能，因为依赖项层可以在多个部署中重复使用。
 
-To create a Lambda layer, we'll follow similar steps, but create two separate zip archives: one for
-the application code and one for the application dependencies.
+要创建 Lambda 层，我们将遵循类似的步骤，但创建两个单独的 zip 存档：一个用于应用程序代码，另一个用于应用程序依赖项。
 
-First, we'll create the dependency layer. Lambda layers are expected to follow a slightly different
-structure, so we'll use `--prefix` rather than `--target`:
+首先，我们将创建依赖项层。Lambda 层需要遵循稍微不同的结构，因此我们将使用 `--prefix` 而不是 `--target`：
 
 ```console
 $ uv export --frozen --no-dev --no-editable -o requirements.txt
@@ -537,7 +496,7 @@ $ uv pip install \
    -r requirements.txt
 ```
 
-We'll then zip the dependencies in adherence with the expected layout for Lambda layers:
+然后，我们将按照 Lambda 层的预期布局压缩依赖项：
 
 ```console
 $ mkdir python
@@ -547,10 +506,9 @@ $ zip -r layer_content.zip python
 
 !!! tip
 
-    To generate deterministic zip archives, consider passing the `-X` flag to `zip` to exclude
-    extended attributes and file system metadata.
+    要生成确定性的 zip 存档，请考虑将 `-X` 标志传递给 `zip` 以排除扩展属性和文件系统元数据。
 
-And publish the Lambda layer:
+并发布 Lambda 层：
 
 ```console
 $ aws lambda publish-layer-version --layer-name dependencies-layer \
@@ -559,13 +517,13 @@ $ aws lambda publish-layer-version --layer-name dependencies-layer \
    --compatible-architectures "x86_64"
 ```
 
-We can then create the Lambda function as in the previous example, omitting the dependencies:
+然后，我们可以像前面的示例一样创建 Lambda 函数，省略依赖项：
 
 ```console
-$ # Zip the application code.
+$ # 压缩应用程序代码。
 $ zip -r app.zip app
 
-$ # Create the Lambda function.
+$ # 创建 Lambda 函数。
 $ aws lambda create-function \
    --function-name myFunction \
    --runtime python3.13 \
@@ -574,8 +532,7 @@ $ aws lambda create-function \
    --role arn:aws:iam::111122223333:role/service-role/my-lambda-role
 ```
 
-Finally, we can attach the dependencies layer to the Lambda function, using the ARN returned by the
-`publish-layer-version` step:
+最后，我们可以将依赖项层附加到 Lambda 函数，使用 `publish-layer-version` 步骤返回的 ARN：
 
 ```console
 $ aws lambda update-function-configuration --function-name myFunction \
@@ -583,17 +540,16 @@ $ aws lambda update-function-configuration --function-name myFunction \
     --layers "arn:aws:lambda:region:111122223333:layer:dependencies-layer:1"
 ```
 
-When the application dependencies change, the layer can be updated independently of the application
-by republishing the layer and updating the Lambda function configuration:
+当应用程序依赖项更改时，可以通过重新发布层并更新 Lambda 函数配置来独立更新层：
 
 ```console
-$ # Update the dependencies in the layer.
+$ # 更新层中的依赖项。
 $ aws lambda publish-layer-version --layer-name dependencies-layer \
    --zip-file fileb://layer_content.zip \
    --compatible-runtimes python3.13 \
    --compatible-architectures "x86_64"
 
-$ # Update the Lambda function configuration.
+$ # 更新 Lambda 函数配置。
 $ aws lambda update-function-configuration --function-name myFunction \
     --cli-binary-format raw-in-base64-out \
     --layers "arn:aws:lambda:region:111122223333:layer:dependencies-layer:2"

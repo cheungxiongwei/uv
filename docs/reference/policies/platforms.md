@@ -1,19 +1,17 @@
-# Platform support
+# 平台支持
 
-uv has Tier 1 support for the following platforms:
+uv 对以下平台提供 Tier 1 支持：
 
 - macOS (Apple Silicon)
 - macOS (x86_64)
 - Linux (x86_64)
 - Windows (x86_64)
 
-uv is continuously built, tested, and developed against its Tier 1 platforms. Inspired by the Rust
-project, Tier 1 can be thought of as
-["guaranteed to work"](https://doc.rust-lang.org/beta/rustc/platform-support.html).
+uv 在其 Tier 1 平台上持续构建、测试和开发。受 Rust 项目的启发，Tier 1 可以被认为是
+["保证可用"](https://doc.rust-lang.org/beta/rustc/platform-support.html)。
 
-uv has Tier 2 support
-(["guaranteed to build"](https://doc.rust-lang.org/beta/rustc/platform-support.html)) for the
-following platforms:
+uv 对以下平台提供 Tier 2 支持
+（["保证可构建"](https://doc.rust-lang.org/beta/rustc/platform-support.html)）：
 
 - Linux (PPC64)
 - Linux (PPC64LE)
@@ -22,13 +20,9 @@ following platforms:
 - Linux (i686)
 - Linux (s390x)
 
-uv ships pre-built wheels to [PyPI](https://pypi.org/project/uv/) for its Tier 1 and Tier 2
-platforms. However, while Tier 2 platforms are continuously built, they are not continuously tested
-or developed against, and so stability may vary in practice.
+uv 为其 Tier 1 和 Tier 2 平台向 [PyPI](https://pypi.org/project/uv/) 提供预构建的 wheel 包。然而，虽然 Tier 2 平台持续构建，但它们并未持续测试或开发，因此在实践中稳定性可能有所不同。
 
-Beyond the Tier 1 and Tier 2 platforms, uv is known to build on i686 Windows, and known _not_ to
-build on aarch64 Windows, but does not consider either platform to be supported at this time. The
-minimum supported Windows versions are Windows 10 and Windows Server 2016, following
-[Rust's own Tier 1 support](https://blog.rust-lang.org/2024/02/26/Windows-7.html).
+除了 Tier 1 和 Tier 2 平台之外，uv 已知可以在 i686 Windows 上构建，但已知无法在 aarch64 Windows 上构建，但 uv 目前并未将这两个平台视为受支持的平台。最低支持的 Windows 版本是 Windows 10 和 Windows Server 2016，遵循
+[Rust 自身的 Tier 1 支持](https://blog.rust-lang.org/2024/02/26/Windows-7.html)。
 
-uv supports and is tested against Python 3.8, 3.9, 3.10, 3.11, 3.12, and 3.13.
+uv 支持并测试了 Python 3.8、3.9、3.10、3.11、3.12 和 3.13。

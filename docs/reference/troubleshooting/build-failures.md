@@ -1,13 +1,10 @@
-# Troubleshooting build failures
+# 构建失败问题排查
 
-uv needs to build packages when there is not a compatible wheel (a pre-built distribution of the
-package) available. Building packages can fail for many reasons, some of which may be unrelated to
-uv itself.
+当没有兼容的wheel（预构建的软件包分发）可用时，uv需要构建软件包。构建软件包可能因多种原因失败，其中一些可能与uv本身无关。
 
-## Recognizing a build failure
+## 识别构建失败
 
-An example build failure can be produced by trying to install and old version of numpy on a new,
-unsupported version of Python:
+可以通过尝试在不受支持的Python版本上安装旧版本的numpy来产生一个构建失败的示例：
 
 ```console
 $ uv pip install -p 3.13 'numpy<1.20'
@@ -28,19 +25,15 @@ Resolved 1 package in 62ms
       on `distutils`.
 ```
 
-Notice that the error message is prefaced by "The build backend returned an error".
+注意，错误消息以“The build backend returned an error”开头。
 
-The build failure includes the `[stderr]` (and `[stdout]`, if present) from the build backend that
-was used for the build. The error logs are not from uv itself.
+构建失败包括来自构建后端的`[stderr]`（如果存在，还包括`[stdout]`）。错误日志并非来自uv本身。
 
-The message following the `╰─▶` is a hint provided by uv, to help resolve common build failures. A
-hint will not be available for all build failures.
+`╰─▶`后面的消息是uv提供的提示，用于帮助解决常见的构建失败。并非所有构建失败都会提供提示。
 
-## Confirming that a build failure is specific to uv
+## 确认构建失败是否与uv相关
 
-Build failures are usually related to your system and the build backend. It is rare that a build
-failure is specific to uv. You can confirm that the build failure is not related to uv by attempting
-to reproduce it with pip:
+构建失败通常与您的系统和构建后端有关。构建失败与uv相关的情况很少见。您可以通过尝试使用pip重现该构建失败来确认其是否与uv无关：
 
 ```console
 $ uv venv -p 3.13 --seed
@@ -78,43 +71,29 @@ ModuleNotFoundError: No module named 'distutils'
 
 !!! important
 
-    The `--use-pep517` flag should be included with the `pip install` invocation to ensure the same
-    build isolation behavior. uv always uses [build isolation by default](../../pip/compatibility.md#pep-517-build-isolation).
+    `pip install`命令中应包含`--use-pep517`标志，以确保相同的构建隔离行为。uv默认始终使用[构建隔离](../../pip/compatibility.md#pep-517-build-isolation)。
 
-    We also recommend including the `--force-reinstall` and `--no-cache` options when reproducing
-    failures.
+    我们建议在重现失败时同时包含`--force-reinstall`和`--no-cache`选项。
 
-Since this build failure occurs in pip too, it is not likely to be a bug with uv.
+由于此构建失败在pip中也会发生，因此不太可能是uv的bug。
 
-If a build failure is reproducible with another installer, you should investigate upstream (in this
-example, `numpy` or `setuptools`), find a way to avoid building the package in the first place, or
-make the necessary adjustments to your system for the build to succeed.
+如果构建失败可以在其他安装程序中重现，您应该调查上游（在本例中为`numpy`或`setuptools`），找到避免构建软件包的方法，或对系统进行必要的调整以使构建成功。
 
-## Why does uv build a package?
+## 为什么uv需要构建软件包？
 
-When generating the cross-platform lockfile, uv needs to determine the dependencies of all packages,
-even those only installed on other platforms. uv tries to avoid package builds during resolution. It
-uses any wheel if exist for that version, then tries to find static metadata in the source
-distribution (mainly pyproject.toml with static `project.version`, `project.dependencies` and
-`project.optional-dependencies` or METADATA v2.2+). Only if all of that fails, it builds the
-package.
+在生成跨平台锁文件时，uv需要确定所有软件包的依赖关系，即使是那些仅在其他平台上安装的软件包。uv在解析过程中尽量避免构建软件包。它使用该版本的任何wheel，然后尝试在源代码分发中找到静态元数据（主要是带有静态`project.version`、`project.dependencies`和`project.optional-dependencies`或METADATA v2.2+的pyproject.toml）。只有当所有这些都失败时，它才会构建软件包。
 
-When installing, uv needs to have a wheel for the current platform for each package. If no matching
-wheel exists in the index, uv tries to build the source distribution.
+在安装时，uv需要为每个软件包提供当前平台的wheel。如果索引中没有匹配的wheel，uv会尝试构建源代码分发。
 
-You can check which wheels exist for a PyPI project under “Download Files”, e.g.
-https://pypi.org/project/numpy/2.1.1.md#files. Wheels with `...-py3-none-any.whl` filenames work
-everywhere, others have the operating system and platform in the filename. In the linked `numpy`
-example, you can see that there are pre-built distributions for Python 3.10 to 3.13 on MacOS, Linux
-and Windows.
+您可以在“Download Files”下查看PyPI项目的现有wheel，例如https://pypi.org/project/numpy/2.1.1.md#files。文件名中带有`...-py3-none-any.whl`的wheel适用于所有平台，其他wheel的文件名中包含操作系统和平台。在链接的`numpy`示例中，您可以看到有适用于Python 3.10到3.13的MacOS、Linux和Windows的预构建分发。
 
-## Common build failures
+## 常见的构建失败
 
-The following examples demonstrate common build failures and how to resolve them.
+以下示例展示了常见的构建失败及其解决方法。
 
-### Command is not found
+### 命令未找到
 
-If the build error mentions a missing command, for example, `gcc`:
+如果构建错误提到缺少命令，例如`gcc`：
 
 <!-- docker run --platform linux/x86_64 -it ghcr.io/astral-sh/uv:python3.10-bookworm-slim /bin/bash -c "uv pip install --system pysha3==1.0.2" -->
 
@@ -139,7 +118,7 @@ If the build error mentions a missing command, for example, `gcc`:
     error: command 'gcc' failed: No such file or directory
 ```
 
-Then, you'll need to install it with your system package manager, e.g., to resolve the error above:
+然后，您需要使用系统包管理器安装它，例如，要解决上述错误：
 
 ```console
 $ apt install gcc
@@ -147,22 +126,19 @@ $ apt install gcc
 
 !!! tip
 
-    When using the uv-managed Python versions, it's common to need `clang` installed instead of
-    `gcc`.
+    当使用uv管理的Python版本时，通常需要安装`clang`而不是`gcc`。
 
-    Many Linux distributions provide a package that includes all the common build dependencies.
-    You can address most build requirements by installing it, e.g., for Debian or Ubuntu:
+    许多Linux发行版提供了一个包含所有常见构建依赖项的包。您可以通过安装它来解决大多数构建需求，例如，对于Debian或Ubuntu：
 
     ```console
     $ apt install build-essential
     ```
 
-### Header or library is missing
+### 头文件或库缺失
 
-If the build error mentions a missing header or library, e.g., a `.h` file, then you'll need to
-install it with your system package manager.
+如果构建错误提到缺少头文件或库，例如`.h`文件，那么您需要使用系统包管理器安装它。
 
-For example, installing `pygraphviz` requires Graphviz to be installed:
+例如，安装`pygraphviz`需要安装Graphviz：
 
 <!-- docker run --platform linux/x86_64 -it ghcr.io/astral-sh/uv:python3.12-bookworm /bin/bash -c "uv pip install --system 'pygraphviz'" -->
 
@@ -194,26 +170,23 @@ For example, installing `pygraphviz` requires Graphviz to be installed:
   hint: This error likely indicates that you need to install a library that provides "graphviz/cgraph.h" for `pygraphviz@1.14`
 ```
 
-To resolve this error on Debian, you'd install the `libgraphviz-dev` package:
+要在Debian上解决此错误，您需要安装`libgraphviz-dev`包：
 
 ```console
 $ apt install libgraphviz-dev
 ```
 
-Note that installing the `graphviz` package is not sufficient, the development headers need to be
-installed.
+请注意，安装`graphviz`包是不够的，需要安装开发头文件。
 
 !!! tip
 
-    To resolve an error where `Python.h` is missing, install the [`python3-dev` package](https://packages.debian.org/bookworm/python3-dev).
+    要解决`Python.h`缺失的错误，请安装[`python3-dev`包](https://packages.debian.org/bookworm/python3-dev)。
 
-### Module is missing or cannot be imported
+### 模块缺失或无法导入
 
-If the build error mentions a failing import, consider
-[disabling build isolation](../../concepts/projects/config.md#build-isolation).
+如果构建错误提到导入失败，请考虑[禁用构建隔离](../../concepts/projects/config.md#build-isolation)。
 
-For example, some packages assume that `pip` is available without declaring it as a build
-dependency:
+例如，某些软件包假设`pip`可用，但未将其声明为构建依赖项：
 
 <!-- docker run --platform linux/x86_64 -it ghcr.io/astral-sh/uv:python3.12-bookworm-slim /bin/bash -c "uv pip install --system chumpy" -->
 
@@ -223,7 +196,7 @@ dependency:
   ╰─▶ Call to `setuptools.build_meta:__legacy__.build_wheel` failed (exit status: 1)
 
     [stderr]
-    Traceback (most recent call last):
+    Traceback ( most recent call last):
       File "<string>", line 9, in <module>
     ModuleNotFoundError: No module named 'pip'
 
@@ -244,27 +217,20 @@ dependency:
     ModuleNotFoundError: No module named 'pip'
 ```
 
-To resolve this error, pre-install the build dependencies then disable build isolation for the
-package:
+要解决此错误，请预先安装构建依赖项，然后为该软件包禁用构建隔离：
 
 ```console
 $ uv pip install pip setuptools
 $ uv pip install chumpy --no-build-isolation-package chumpy
 ```
 
-Note you will need to install the missing package, e.g., `pip`, _and_ all the other build
-dependencies of the package, e.g, `setuptools`.
+请注意，您需要安装缺失的软件包，例如`pip`，以及该软件包的所有其他构建依赖项，例如`setuptools`。
 
-### Old version of the package is built
+### 构建了旧版本的软件包
 
-If a package fails to build during resolution and the version that failed to build is older than the
-version you want to use, try adding a [constraint](../settings.md#constraint-dependencies) with a
-lower bound (e.g. `numpy>=1.17`). Sometimes, due to algorithmic limitations, the uv resolver tries
-to find a fitting version using unreasonably old packages, which can be prevented by using lower
-bounds.
+如果在解析过程中构建软件包失败，并且构建失败的版本比您要使用的版本旧，请尝试添加一个带有下限的[约束](../settings.md#constraint-dependencies)（例如`numpy>=1.17`）。有时，由于算法限制，uv解析器会尝试使用不合理的旧软件包来找到合适的版本，这可以通过使用下限来防止。
 
-For example, when resolving the following dependencies on Python 3.10, uv attempts to build an old
-version of `apache-beam`.
+例如，在Python 3.10上解析以下依赖项时，uv尝试构建旧版本的`apache-beam`。
 
 ```title="requirements.txt"
 dill<0.3.9,>=0.2.2
@@ -282,33 +248,23 @@ apache-beam<=2.49.0
     ...
 ```
 
-Adding a lower bound constraint, e.g., `apache-beam<=2.49.0,>2.30.0`, resolves this build failure as
-uv will avoid using an old version of `apache-beam`.
+添加下限约束，例如`apache-beam<=2.49.0,>2.30.0`，可以解决此构建失败，因为uv将避免使用旧版本的`apache-beam`。
 
-Constraints can also be defined for indirect dependencies using `constraints.txt` files or the
-[`constraint-dependencies`](../settings.md#constraint-dependencies) setting.
+也可以使用`constraints.txt`文件或[`constraint-dependencies`](../settings.md#constraint-dependencies)设置来为间接依赖项定义约束。
 
-### Package is only needed for an unused platform
+### 软件包仅在未使用的平台上需要
 
-If locking fails due to building a package from a platform you do not need to support, consider
-[limiting resolution](../../concepts/projects/config.md#limited-resolution-environments) to your
-supported platforms.
+如果由于构建您不需要支持的平台上的软件包而导致锁定失败，请考虑[限制解析](../../concepts/projects/config.md#limited-resolution-environments)到您支持的平台。
 
-### Package does not support all Python versions
+### 软件包不支持所有Python版本
 
-If you support a large range of Python versions, consider using markers to use older versions for
-older Python versions and newer versions for newer Python version. For example, `numpy` only
-supports four Python minor version at a time, so to support a wider range of Python versions, e.g.,
-Python 3.8 to 3.13, the `numpy` requirement needs to be split:
+如果您支持广泛的Python版本，请考虑使用标记来为较旧的Python版本使用较旧的版本，为较新的Python版本使用较新的版本。例如，`numpy`仅支持四个Python小版本，因此要支持更广泛的Python版本，例如Python 3.8到3.13，需要拆分`numpy`需求：
 
 ```
 numpy>=1.23; python_version >= "3.10"
 numpy<1.23; python_version < "3.10"
 ```
 
-### Package is only usable on a specific platform
+### 软件包仅在特定平台上可用
 
-If locking fails due to building a package that is only usable on another platform, you can
-[provide dependency metadata manually](../settings.md#dependency-metadata) to skip the build. uv can
-not verify this information, so it is important to specify correct metadata when using this
-override.
+如果由于构建仅在另一个平台上可用的软件包而导致锁定失败，您可以[手动提供依赖元数据](../settings.md#dependency-metadata)以跳过构建。uv无法验证此信息，因此在使用此覆盖时指定正确的元数据非常重要。

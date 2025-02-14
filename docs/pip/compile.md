@@ -1,69 +1,61 @@
-# Locking environments
+```md docs/pip/compile.md (1-158)
+# 锁定环境
 
-Locking is to take a dependency, e.g., `ruff`, and write an exact version to use to a file. When
-working with many dependencies, it is useful to lock the exact versions so the environment can be
-reproduced. Without locking, the versions of dependencies could change over time, when using a
-different tool, or across platforms.
+锁定是指获取一个依赖项，例如 `ruff`，并将其使用的确切版本写入文件。当处理多个依赖项时，锁定确切版本非常有用，以便可以重现环境。如果不锁定，依赖项的版本可能会随着时间的推移、使用不同的工具或跨平台时发生变化。
 
-## Locking requirements
+## 锁定要求
 
-uv allows dependencies to be locked in the `requirements.txt` format. It is recommended to use the
-standard `pyproject.toml` to define dependencies, but other dependency formats are supported as
-well. See the documentation on [declaring dependencies](dependencies.md) for more details on how to
-define dependencies.
+uv 允许以 `requirements.txt` 格式锁定依赖项。建议使用标准的 `pyproject.toml` 来定义依赖项，但也支持其他依赖项格式。有关如何定义依赖项的更多详细信息，请参阅 [声明依赖项](dependencies.md) 的文档。
 
-To lock dependencies declared in a `pyproject.toml`:
+要锁定在 `pyproject.toml` 中声明的依赖项：
 
 ```console
 $ uv pip compile pyproject.toml -o requirements.txt
 ```
 
-Note by default the `uv pip compile` output is just displayed and `--output-file` / `-o` argument is
-needed to write to a file.
+请注意，默认情况下 `uv pip compile` 的输出仅显示，需要使用 `--output-file` / `-o` 参数将其写入文件。
 
-To lock dependencies declared in a `requirements.in`:
+要锁定在 `requirements.in` 中声明的依赖项：
 
 ```console
 $ uv pip compile requirements.in -o requirements.txt
 ```
 
-To lock dependencies declared in multiple files:
+要锁定在多个文件中声明的依赖项：
 
 ```console
 $ uv pip compile pyproject.toml requirements-dev.in -o requirements-dev.txt
 ```
 
-uv also supports legacy `setup.py` and `setup.cfg` formats. To lock dependencies declared in a
-`setup.py`:
+uv 还支持传统的 `setup.py` 和 `setup.cfg` 格式。要锁定在 `setup.py` 中声明的依赖项：
 
 ```console
 $ uv pip compile setup.py -o requirements.txt
 ```
 
-To lock dependencies from stdin, use `-`:
+要从 stdin 锁定依赖项，请使用 `-`：
 
 ```console
 $ echo "ruff" | uv pip compile -
 ```
 
-To lock with optional dependencies enabled, e.g., the "foo" extra:
+要启用可选依赖项进行锁定，例如 "foo" 额外项：
 
 ```console
 $ uv pip compile pyproject.toml --extra foo
 ```
 
-To lock with all optional dependencies enabled:
+要启用所有可选依赖项进行锁定：
 
 ```console
 $ uv pip compile pyproject.toml --all-extras
 ```
 
-Note extras are not supported with the `requirements.in` format.
+请注意，`requirements.in` 格式不支持额外项。
 
-## Upgrading requirements
+## 升级依赖项
 
-When using an output file, uv will consider the versions pinned in an existing output file. If a
-dependency is pinned it will not be upgraded on a subsequent compile run. For example:
+当使用输出文件时，uv 会考虑现有输出文件中固定的版本。如果依赖项已固定，则在后续的编译运行中不会升级。例如：
 
 ```console
 $ echo "ruff==0.3.0" > requirements.txt
@@ -73,85 +65,71 @@ $ echo "ruff" | uv pip compile - -o requirements.txt
 ruff==0.3.0
 ```
 
-To upgrade a dependency, use the `--upgrade-package` flag:
+要升级依赖项，请使用 `--upgrade-package` 标志：
 
 ```console
 $ uv pip compile - -o requirements.txt --upgrade-package ruff
 ```
 
-To upgrade all dependencies, there is an `--upgrade` flag.
+要升级所有依赖项，可以使用 `--upgrade` 标志。
 
-## Syncing an environment
+## 同步环境
 
-Dependencies can be installed directly from their definition files or from compiled
-`requirements.txt` files with `uv pip install`. See the documentation on
-[installing packages from files](packages.md#installing-packages-from-files) for more details.
+可以直接从其定义文件或从编译的 `requirements.txt` 文件安装依赖项，使用 `uv pip install`。有关更多详细信息，请参阅 [从文件安装包](packages.md#installing-packages-from-files) 的文档。
 
-When installing with `uv pip install`, packages that are already installed will not be removed
-unless they conflict with the lockfile. This means that the environment can have dependencies that
-aren't declared in the lockfile, which isn't great for reproducibility. To ensure the environment
-exactly matches the lockfile, use `uv pip sync` instead.
+使用 `uv pip install` 安装时，除非与 lockfile 冲突，否则不会删除已安装的包。这意味着环境中可能包含未在 lockfile 中声明的依赖项，这对于可重现性并不理想。要确保环境与 lockfile 完全匹配，请改用 `uv pip sync`。
 
-To sync an environment with a `requirements.txt` file:
+要使用 `requirements.txt` 文件同步环境：
 
 ```console
 $ uv pip sync requirements.txt
 ```
 
-To sync an environment with a `pyproject.toml` file:
+要使用 `pyproject.toml` 文件同步环境：
 
 ```console
 $ uv pip sync pyproject.toml
 ```
 
-## Adding constraints
+## 添加约束
 
-Constraints files are `requirements.txt`-like files that only control the _version_ of a requirement
-that's installed. However, including a package in a constraints file will _not_ trigger the
-installation of that package. Constraints can be used to add bounds to dependencies that are not
-dependencies of the current project.
+约束文件是类似于 `requirements.txt` 的文件，仅控制安装的依赖项的 _版本_。但是，在约束文件中包含一个包不会触发该包的安装。约束可用于为不是当前项目依赖项的依赖项添加限制。
 
-To define a constraint, define a bound for a package:
+要定义约束，请为包定义一个限制：
 
 ```python title="constraints.txt"
 pydantic<2.0
 ```
 
-To use a constraints file:
+要使用约束文件：
 
 ```console
 $ uv pip compile requirements.in --constraint constraints.txt
 ```
 
-Note that multiple constraints can be defined in each file and multiple files can be used.
+请注意，每个文件中可以定义多个约束，并且可以使用多个文件。
 
-## Overriding dependency versions
+## 覆盖依赖项版本
 
-Overrides files are `requirements.txt`-like files that force a specific version of a requirement to
-be installed, regardless of the requirements declared by any constituent package, and regardless of
-whether this would be considered an invalid resolution.
+覆盖文件是类似于 `requirements.txt` 的文件，强制安装特定版本的依赖项，无论任何组成包声明的需求如何，也不管这是否会被视为无效的解析。
 
-While constraints are _additive_, in that they're combined with the requirements of the constituent
-packages, overrides are _absolute_, in that they completely replace the requirements of the
-constituent packages.
+虽然约束是 _附加的_，因为它们与组成包的需求相结合，但覆盖是 _绝对的_，因为它们完全替换了组成包的需求。
 
-Overrides are most often used to remove upper bounds from a transitive dependency. For example, if
-`a` requires `c>=1.0,<2.0` and `b` requires `c>=2.0` and the current project requires `a` and `b`
-then the dependencies cannot be resolved.
+覆盖最常用于删除传递依赖项的上限。例如，如果 `a` 需要 `c>=1.0,<2.0` 且 `b` 需要 `c>=2.0`，而当前项目需要 `a` 和 `b`，则无法解析依赖项。
 
-To define an override, define the new requirement for the problematic package:
+要定义覆盖，请为有问题的包定义新的需求：
 
 ```python title="overrides.txt"
 c>=2.0
 ```
 
-To use an overrides file:
+要使用覆盖文件：
 
 ```console
 $ uv pip compile requirements.in --override overrides.txt
 ```
 
-Now, resolution can succeed. However, note that if `a` is _correct_ that it does not support
-`c>=2.0` then a runtime error will likely be encountered when using the packages.
+现在，解析可以成功。但是，请注意，如果 `a` _正确_ 地不支持 `c>=2.0`，则在使用包时可能会遇到运行时错误。
 
-Note that multiple overrides can be defined in each file and multiple files can be used.
+请注意，每个文件中可以定义多个覆盖，并且可以使用多个文件。
+```
